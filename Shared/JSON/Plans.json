@@ -1,0 +1,404 @@
+{
+  "categories": [
+    {
+      "id": "Popular",
+      "name": "Popular Plans"
+    },
+    {
+      "id": "Validity",
+      "name": "Validity"
+    },
+    {
+      "id": "data",
+      "name": "Data Packs"
+    },
+    {
+      "id": "annual",
+      "name": "Annual Plans"
+    },
+    {
+      "id": "topup",
+      "name": "Top-Up"
+    },
+    {
+      "id": "international",
+      "name": "International Plans"
+    },
+    {
+      "id": "ott",
+      "name": "OTT Bundles"
+    }
+  ],
+  "plans": [
+    {
+      "category": "Popular",
+      "price": 299,
+      "data": "1.5GB/day",
+      "validity": "28 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "634e"
+    },
+    {
+      "category": "Popular",
+      "price": 499,
+      "data": "2GB/day",
+      "validity": "56 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "29ab"
+    },
+    {
+      "category": "Popular",
+      "price": 699,
+      "data": "3GB/day",
+      "validity": "84 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "f83d"
+    },
+    {
+      "category": "Validity",
+      "price": 199,
+      "data": "1GB/day",
+      "validity": "14 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "a23b"
+    },
+    {
+      "category": "Validity",
+      "price": 299,
+      "data": "1.5GB/day",
+      "validity": "28 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "8fb1"
+    },
+    {
+      "category": "Validity",
+      "price": 399,
+      "data": "2GB/day",
+      "validity": "30 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "2ddd"
+    },
+    {
+      "category": "Validity",
+      "price": 599,
+      "data": "2.5GB/day",
+      "validity": "60 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "2692"
+    },
+    {
+      "category": "Validity",
+      "price": 799,
+      "data": "3GB/day",
+      "validity": "90 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "510c"
+    },
+    {
+      "category": "Validity",
+      "price": 999,
+      "data": "3.5GB/day",
+      "validity": "120 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "b957"
+    },
+    {
+      "category": "Validity",
+      "price": 1499,
+      "data": "4GB/day",
+      "validity": "180 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "dc25"
+    },
+    {
+      "category": "data",
+      "price": 19,
+      "data": "1GB",
+      "validity": "1 Hour",
+      "sms": "Unlimited SMS",
+      "id": "f2b7"
+    },
+    {
+      "category": "data",
+      "price": 49,
+      "data": "3GB",
+      "validity": "6 Hours",
+      "sms": "Unlimited SMS",
+      "id": "ad60"
+    },
+    {
+      "category": "data",
+      "price": 99,
+      "data": "5GB",
+      "validity": "24 Hours",
+      "sms": "Unlimited SMS",
+      "id": "4e38"
+    },
+    {
+      "category": "data",
+      "price": 199,
+      "data": "10GB",
+      "validity": "7 Days",
+      "sms": "Unlimited SMS",
+      "id": "ca25"
+    },
+    {
+      "category": "data",
+      "price": 399,
+      "data": "30GB",
+      "validity": "28 Days",
+      "sms": "Unlimited SMS",
+      "id": "5667"
+    },
+    {
+      "category": "5g",
+      "price": 399,
+      "data": "3GB/day",
+      "validity": "28 Days",
+      "calls": "Unlimited Calls",
+      "speed": "5G Ultra-Speed",
+      "sms": "Unlimited SMS",
+      "id": "3e43"
+    },
+    {
+      "category": "5g",
+      "price": 699,
+      "data": "5GB/day",
+      "validity": "56 Days",
+      "calls": "Unlimited Calls",
+      "speed": "5G Ultra-Speed",
+      "sms": "Unlimited SMS",
+      "id": "ac4f"
+    },
+    {
+      "category": "5g",
+      "price": 999,
+      "data": "6GB/day",
+      "validity": "84 Days",
+      "calls": "Unlimited Calls",
+      "speed": "5G Ultra-Speed",
+      "benefits": "Free 100GB Cloud Storage",
+      "sms": "Unlimited SMS",
+      "id": "3321"
+    },
+    {
+      "category": "5g",
+      "price": 1999,
+      "data": "10GB/day",
+      "validity": "365 Days",
+      "calls": "Unlimited Calls",
+      "speed": "5G Premium",
+      "benefits": "Priority Customer Support + Free International Roaming",
+      "sms": "Unlimited SMS",
+      "id": "4cd8"
+    },
+    {
+      "category": "annual",
+      "price": 1499,
+      "data": "1.5GB/day",
+      "validity": "365 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "aa9e"
+    },
+    {
+      "category": "annual",
+      "price": 1799,
+      "data": "2GB/day",
+      "validity": "365 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "e6f6"
+    },
+    {
+      "category": "annual",
+      "price": 1999,
+      "data": "2.5GB/day",
+      "validity": "365 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "6ad9"
+    },
+    {
+      "category": "annual",
+      "price": 2399,
+      "data": "3GB/day",
+      "validity": "365 Days",
+      "calls": "Unlimited Calls",
+      "sms": "Unlimited SMS",
+      "id": "e966"
+    },
+    {
+      "category": "topup",
+      "price": 50,
+      "calls": "₹39 Talktime",
+      "sms": "Unlimited SMS",
+      "id": "471f"
+    },
+    {
+      "category": "topup",
+      "price": 100,
+      "calls": "₹81 Talktime",
+      "sms": "Unlimited SMS",
+      "id": "c5a3"
+    },
+    {
+      "category": "topup",
+      "price": 200,
+      "calls": "₹175 Talktime",
+      "sms": "Unlimited SMS",
+      "id": "6e40"
+    },
+    {
+      "category": "topup",
+      "price": 500,
+      "calls": "₹420 Talktime",
+      "sms": "Unlimited SMS",
+      "id": "a3f9"
+    },
+    {
+      "category": "topup",
+      "price": 1000,
+      "calls": "₹850 Talktime",
+      "sms": "Unlimited SMS",
+      "id": "f43c"
+    },
+    {
+      "category": "international",
+      "price": 499,
+      "data": "500MB/day",
+      "validity": "7 Days",
+      "calls": "100 Minutes",
+      "sms": "Unlimited SMS",
+      "id": "ed94"
+    },
+    {
+      "category": "international",
+      "price": 999,
+      "data": "1GB/day",
+      "validity": "14 Days",
+      "calls": "200 Minutes",
+      "sms": "Unlimited SMS",
+      "id": "284b"
+    },
+    {
+      "category": "international",
+      "price": 1999,
+      "data": "2GB/day",
+      "validity": "30 Days",
+      "calls": "500 Minutes",
+      "sms": "Unlimited SMS",
+      "id": "4cd0"
+    },
+    {
+      "category": "international",
+      "price": 1499,
+      "data": "3GB/day",
+      "validity": "30 Days",
+      "calls": "500 Minutes",
+      "roaming": "Free International Roaming",
+      "sms": "Unlimited SMS",
+      "id": "0503"
+    },
+    {
+      "category": "international",
+      "price": 2499,
+      "data": "5GB/day",
+      "validity": "60 Days",
+      "calls": "1000 Minutes",
+      "roaming": "Unlimited Global Roaming",
+      "sms": "Unlimited SMS",
+      "id": "d6f5"
+    },
+    {
+      "category": "ott",
+      "price": 499,
+      "data": "1GB/day",
+      "validity": "28 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "Netflix Subscription",
+      "sms": "Unlimited SMS",
+      "id": "c997"
+    },
+    {
+      "category": "ott",
+      "price": 699,
+      "data": "2GB/day",
+      "validity": "56 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "Amazon Prime Subscription",
+      "sms": "Unlimited SMS",
+      "id": "ead2"
+    },
+    {
+      "category": "ott",
+      "price": 799,
+      "data": "2.5GB/day",
+      "validity": "56 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "Jio Hotstar",
+      "sms": "Unlimited SMS",
+      "id": "b94d"
+    },
+    {
+      "category": "ott",
+      "price": 999,
+      "data": "3GB/day",
+      "validity": "84 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "SonyLiv + ZEE5",
+      "sms": "Unlimited SMS",
+      "id": "f904"
+    },
+    {
+      "category": "ott",
+      "price": 1299,
+      "data": "3.5GB/day",
+      "validity": "120 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "Netflix + Amazon Prime + Jio Hotstar",
+      "sms": "Unlimited SMS",
+      "id": "2ec9"
+    },
+    {
+      "category": "ott",
+      "price": 1499,
+      "data": "4GB/day",
+      "validity": "180 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "All Major OTT Platforms",
+      "sms": "Unlimited SMS",
+      "id": "0939"
+    },
+    {
+      "category": "ott",
+      "price": 1599,
+      "data": "4.5GB/day",
+      "validity": "210 Days",
+      "calls": "Unlimited Calls",
+      "benefits": "Netflix + Amazon Prime + Jio Hotstar + YouTube Premium",
+      "sms": "Unlimited SMS",
+      "id": "6d13"
+    },
+    {
+      "id": "e241",
+      "category": "Popular",
+      "price": "199",
+      "data": "1gb",
+      "validity": "28",
+      "calls": "unlimted",
+      "benefits": "",
+      "active": true
+    }
+  ]
+}

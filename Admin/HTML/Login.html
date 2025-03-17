@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobi Comm Admin Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/Admin/CSS/Login.css">
+</head>
+<body>
+<!-- Background shapes -->
+<div class="background-objects">
+  <div class="glass-shape shape-1"></div>
+  <div class="glass-shape shape-2"></div>
+  <div class="glass-shape shape-3"></div>
+  <div class="glass-shape shape-4"></div>
+</div>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="company-branding">
+      <div class="company-name">Mobi Comm</div>
+      <div class="portal-type">Admin Portal</div>
+    </div>
+
+    <div class="login-header">
+      <h2>Login</h2>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Username or Email</label>
+        <i class="fas fa-user input-icon"></i>
+        <input type="text" class="form-control" id="username" placeholder="Enter your username">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <i class="fas fa-lock input-icon"></i>
+        <input type="password" class="form-control" id="password" placeholder="Enter your password">
+        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+      </div>
+
+      <div class="form-bottom">
+        <label class="custom-checkbox">
+          <input type="checkbox" id="rememberMe">
+          <span class="checkmark"></span>
+          <span class="checkbox-label">Remember me</span>
+        </label>
+
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" id="loginButton" class="btn-login">
+        Login
+      </button>
+    </form>
+  </div>
+</div>
+<script src="/Admin/JS/Login.js"></script>
+</body>
+</html>

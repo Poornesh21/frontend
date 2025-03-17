@@ -1,0 +1,154 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Arun Kumar",
+      "phone": "9876543210",
+      "email": "arun.kumar@example.com",
+      "planDetails": {
+        "category": "Prepaid",
+        "price": 299,
+        "data": "1.5GB/day",
+        "validity": "28 Days",
+        "calls": "Unlimited Calls"
+      },
+      "active": true,
+      "lastActive": "2025-02-01T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "name": "Divya Raj",
+      "phone": "9876543211",
+      "email": "divya.raj@example.com",
+      "planDetails": {
+        "category": "Topup",
+        "price": 50,
+        "data": "",
+        "validity": "",
+        "calls": "₹39 Talktime"
+      },
+      "active": false,
+      "lastActive": "2025-01-15T00:00:00Z"
+    },
+    {
+      "id": "3",
+      "name": "Sundar Raghavan",
+      "phone": "9876543212",
+      "email": "sundar.raghavan@example.com",
+      "planDetails": {
+        "category": "Data",
+        "price": 99,
+        "data": "5GB",
+        "validity": "24 Hours",
+        "calls": ""
+      },
+      "active": true,
+      "dataRemaining": "3GB left"
+    },
+    {
+      "id": "4",
+      "name": "Lakshmi Narayanan",
+      "phone": "9876543213",
+      "email": "lakshmi.narayanan@example.com",
+      "planDetails": {
+        "category": "Annual",
+        "price": 1499,
+        "data": "1.5GB/day",
+        "validity": "365 Days",
+        "calls": "Unlimited Calls"
+      },
+      "active": true,
+      "planExpired": true
+    },
+    {
+      "id": "5",
+      "name": "Vijayalakshmi",
+      "phone": "9876543214",
+      "email": "vijayalakshmi@example.com",
+      "planDetails": {
+        "category": "Prepaid",
+        "price": 399,
+        "data": "2GB/day",
+        "validity": "30 Days",
+        "calls": "Unlimited Calls"
+      },
+      "active": false,
+      "lastActive": "2025-02-05T00:00:00Z"
+    },
+    {
+      "id": "6",
+      "name": "Kumaravel",
+      "phone": "9876543215",
+      "email": "kumaravel@example.com",
+      "planDetails": {
+        "category": "Topup",
+        "price": 50,
+        "data": "",
+        "validity": "",
+        "calls": "₹39 Talktime"
+      },
+      "active": true,
+      "planExpired": true
+    },
+    {
+      "id": "7",
+      "name": "Meenakshi Sundaram",
+      "phone": "9876543216",
+      "email": "meenakshi.sundaram@example.com",
+      "planDetails": {
+        "category": "Popular",
+        "price": 299,
+        "data": "1.5GB/day",
+        "validity": "28 Days",
+        "calls": "Unlimited Calls"
+      },
+      "active": false,
+      "lastActive": "2025-02-10T00:00:00Z"
+    },
+    {
+      "id": "8",
+      "name": "Ramachandran",
+      "phone": "9876543217",
+      "email": "ramachandran@example.com",
+      "planDetails": {
+        "category": "Data",
+        "price": 99,
+        "data": "5GB",
+        "validity": "24 Hours",
+        "calls": ""
+      },
+      "active": true,
+      "dataRemaining": "2.5GB left"
+    },
+    {
+      "id": "9",
+      "name": "Anitha Devi",
+      "phone": "9876543218",
+      "email": "anitha.devi@example.com",
+      "planDetails": {
+        "category": "Prepaid",
+        "price": 399,
+        "data": "2GB/day",
+        "validity": "30 Days",
+        "calls": "Unlimited Calls"
+      },
+      "active": false,
+      "lastActive": "2025-01-28T00:00:00Z"
+    },
+    {
+      "id": "10",
+      "name": "Harini Prasad",
+      "phone": "9876543219",
+      "email": "harini.prasad@example.com",
+      "planDetails": {
+        "category": "Annual",
+        "price": 1499,
+        "data": "1.5GB/day",
+        "validity": "365 Days",
+        "calls": "Unlimited Calls"
+      },
+      "active": true,
+      "planExpired": true
+    }
+  ]
+}

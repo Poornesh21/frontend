@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mobi Comm</title>
+  <link rel="icon" href="Assests/Images/Logo.png" />
+  <link rel="stylesheet" href="css/recharge.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- CSS styles -->
+  <style>
+    html, body {
+      overflow-x: hidden;
+    }
+    :root {
+      --primary-color: #dc3545;
+      --card-bg-color: #94b1e7;
+      --text-color: #333;
+      --border-radius: 15px;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --hover-transition: all 0.3s ease;
+    }
+    * {
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+    }
+    body {
+      background-color: #f9f3f3;
+      margin: 0;
+      padding: 0;
+      font-size: 1.1rem;
+      padding-top: 80px; /* For fixed header */
+    }
+    /* Header */
+    header {
+      padding: 1rem 2rem;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      margin-bottom: 10px;
+    }
+    .brand-name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-right: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .brand-name:hover {
+      transform: scale(1.1);
+      text-shadow: 0 0 15px rgba(220,53,69,0.3);
+    }
+    nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    nav a {
+      color: var(--secondary-color);
+      text-decoration: none;
+      position: relative;
+      padding: 0.25rem 0;
+    }
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-color);
+      transition: width 0.3s ease, left 0.3s ease;
+    }
+    nav a:hover::after {
+      width: 100%;
+      left: 0;
+    }
+    /* Profile Dropdown */
+    .btn-profile {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+    .dropdown:hover .dropdown-menu {
+      display: block !important;
+    }
+    .dropdown-menu {
+      right: 0;
+      left: auto;
+      max-width: 90vw;
+    }
+    .dropdown-menu a:hover {
+      background: var(--primary-color) !important;
+      color: #fff !important;
+    }
+    /* Footer */
+    footer {
+      margin-top: 80px;
+    }
+    footer .img-fluid {
+      height: 250px;
+      object-fit: cover;
+    }
+    /* Recharge Section */
+    .custom-textbox {
+      position: relative;
+      border: 1px solid #f9f3f3;
+      border-radius: 16px;
+      padding: 0.5rem;
+      background: #fff;
+    }
+    .custom-textbox.move-left {
+      max-width: 300px;
+      min-height: 45px;
+    }
+    .mobile-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      padding: 0.7rem;
+    }
+    .change-link {
+      font-size: 1rem;
+      padding: 0.5rem;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary-color);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    /* Search & Filter */
+    .search-filter-container {
+      margin-top: 20px;
+    }
+    .search-filter-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .search-box {
+      position: relative;
+      width: 250px;
+    }
+    .search-box .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ccc;
+      font-size: 1.2rem;
+    }
+    .search-box input.mobile-input {
+      padding-left: 35px;
+    }
+    .search-filter-group .btn-filter {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      cursor: pointer;
+    }
+    #globalSearchResults {
+      display: none;
+    }
+    /* Category Tabs */
+    .nav-tabs {
+      margin-top: 10px;
+      border-bottom: none;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .nav-tabs li {
+      display: inline-block;
+    }
+    .nav-tabs .nav-link {
+      background: #f9f3f3;
+      border: 1px solid rgba(206,212,218,0.5);
+      border-radius: 20px;
+      margin-right: 10px;
+      color: var(--primary-color);
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+    }
+    .nav-tabs .nav-link.active {
+      background: var(--primary-color);
+      color: #fff;
+      border-color: var(--primary-color);
+    }
+    @media (max-width: 767.98px) {
+      header { padding: 1rem; }
+      .brand-name { font-size: 1.5rem; }
+      nav { gap: 0.5rem; }
+      .custom-textbox { width: 100% !important; }
+    }
+    /* Recharge Card */
+    .recharge-card {
+      width: 100%;
+      max-width: 950px;
+      min-height: 150px;
+      background: #fffaf9;
+      border: 1px solid #e0d0d0;
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 0 auto 20px;
+    }
+    .ott-card {
+      width: 100%;
+      max-width: 950px;
+      min-height: 150px;
+    }
+    .price-container {
+      position: absolute;
+      left: -10px;
+      top: 35px;
+    }
+    .price-tag {
+      background: #e74c55;
+      color: #fff;
+      font-size: 32px;
+      font-weight: bold;
+      width: 111px;
+      height: 80px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+      border-bottom-left-radius: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      transform: translateX(-2px);
+    }
+    .price-tag::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -10px;
+      width: 10px;
+      height: 10px;
+      background: #b33840;
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+      transform: translateX(2px);
+    }
+    /* Uniform Details Container for all cards */
+    .details.new-details {
+      position: absolute;
+      left: 140px;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 4px;
+      border-bottom: 1px dashed #444;
+      padding-bottom: 4px;
+      margin-top: 10px;
+      margin-left: -10px;
+    }
+    .details.new-details .detail-item {
+      white-space: nowrap;
+      margin-right: 20px;
+    }
+    .details.new-details i {
+      margin-right: 5px;
+      color: var(--primary-color);
+      font-size: 16px;
+    }
+    /* OTT Benefits Section */
+    .ott-benefits {
+      position: absolute;
+      left: 140px;
+      bottom: 45px;
+      right: 20px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ott-benefits i {
+      color: var(--primary-color);
+      font-size: 1rem;
+      vertical-align: middle;
+    }
+    .ott-benefits .benefits-text {
+      font-weight: normal;
+      vertical-align: middle;
+    }
+    /* Ensure the OTT logo is displayed inline and properly aligned */
+    .ott-benefits img.ott-logo {
+      height: 20px;
+      width: auto;
+      margin-right: 5px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .buy-button {
+      background: #e74c55;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+    .buy-button:hover {
+      background: #d36251;
+    }
+    .recharge-btn {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .recharge-btn:hover {
+      transform: scale(1.05);
+    }
+    .recharge-btn:active:after {
+      content: "";
+      position: absolute;
+      background: rgba(220,53,69,0.3);
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 0.6s ease-out;
+    }
+    @keyframes ripple {
+      from { opacity: 1; transform: translate(-50%, -50%) scale(0); }
+      to { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+    }
+    .recharge-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    /* Scrollspy Container */
+    .scrollspy-container {
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: calc(100vh - 150px);
+    }
+    /* Loading spinner */
+    #loading-spinner {
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header>
+  <div class="d-flex align-items-center">
+    <div class="brand-name fw-bold">Mobi Comm</div>
+    <nav>
+      <a href="/User/HTML/Home.html">Home</a>
+      <a href="/User/HTML/Recharge.html">Recharge</a>
+      <a href="/User/HTML/Home.html">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main>
+  <div class="container mt-4 search-filter-container">
+    <!-- Loading Spinner -->
+    <div id="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading plans...</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="error-message" class="alert alert-danger d-none" role="alert">
+      Failed to load plans. Please try again later.
+    </div>
+
+    <!-- Search & Filter Row -->
+    <div class="row align-items-center">
+      <div class="col-md-4 mb-3">
+        <div class="custom-textbox move-left">
+          <input type="text" class="mobile-input" id="rechargeMobileNumber" placeholder="Enter your mobile number" maxlength="10" oninput="validateNumber(this)" onkeypress="return isNumberKey(event)">
+          <a class="change-link" onclick="updateNumber()">Change</a>
+        </div>
+      </div>
+      <div class="col-md-8 mb-3">
+        <div class="search-filter-group">
+          <div class="custom-textbox search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="mobile-input" id="searchInput" placeholder="Search plans (e.g., 199)" oninput="filterCards()">
+          </div>
+          <button class="btn btn-filter" id="filterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+            <i class="fas fa-filter"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <label class="dropdown-item-text">Data Plans:</label>
+              <select class="form-select" id="dataFilter" onchange="filterCards()">
+                <option value="">All</option>
+                <option value="1.5GB/day">1.5GB/day</option>
+                <option value="2GB/day">2GB/day</option>
+                <option value="3GB/day">3GB/day</option>
+                <option value="Unlimited">Unlimited</option>
+              </select>
+            </li>
+            <li class="mt-2">
+              <label class="dropdown-item-text">Validity:</label>
+              <select class="form-select" id="validityFilter" onchange="filterCards()">
+                <option value="">All</option>
+                <option value="14 Days">14 Days</option>
+                <option value="28 Days">28 Days</option>
+                <option value="30 Days">30 Days</option>
+                <option value="56 Days">56 Days</option>
+                <option value="60 Days">60 Days</option>
+                <option value="84 Days">84 Days</option>
+                <option value="90 Days">90 Days</option>
+                <option value="120 Days">120 Days</option>
+                <option value="180 Days">180 Days</option>
+                <option value="210 Days">210 Days</option>
+                <option value="365 Days">365 Days</option>
+              </select>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Nav Tabs -->
+    <ul class="nav nav-tabs" id="rechargeTabs"></ul>
+
+    <!-- Global Search Results -->
+    <div id="globalSearchResults" class="row mt-4"></div>
+
+    <!-- Scrollspy Container -->
+    <div class="scrollspy-container">
+      <div class="tab-content mt-3" id="tabContent"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-white py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <h5 class="fw-bold mb-3">About MobiComm</h5>
+        <p class="mb-3">Leading mobile recharge platform serving millions of users nationwide.</p>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h5 class="fw-bold mb-3">Services</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">Prepaid Recharge</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">Postpaid Bill</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">Data Plans</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">International Packs</a></li>
+        </ul>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h5 class="fw-bold mb-3">Support</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">FAQ</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">Contact Support</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-dark">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h5 class="fw-bold mb-3">Connect</h5>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-dark"><i class="fab fa-facebook fa-lg"></i></a>
+          <a href="#" class="text-dark"><i class="fab fa-twitter fa-lg"></i></a>
+          <a href="#" class="text-dark"><i class="fab fa-instagram fa-lg"></i></a>
+          <a href="#" class="text-dark"><i class="fab fa-linkedin fa-lg"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-image">
+    <img src="/USER/Assests/Images/Footer.png" alt="Mobile recharge" class="img-fluid w-100" style="height: 250px; object-fit: cover; padding: 0 10px">
+  </div>
+</footer>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px">
+  <div class="d-flex">
+    <div class="toast-body" id="toast-message">Mobile number updated successfully!</div>
+    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+<script src="/User/JS/Recharge.js">
+</script>
+</body>
+</html>
