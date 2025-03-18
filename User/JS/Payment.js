@@ -1,11 +1,11 @@
-// payment.js - Complete implementation with invoice email support
+// payment.js - With email field below mobile number
 const API_BASE_URL = 'http://localhost:8080'; // Match the same base URL used in recharge.js
 
 document.addEventListener('DOMContentLoaded', function() {
     // Apply UI enhancements first
     applyUIEnhancements();
 
-    // Get data from sessionStorage instead of URL parameters
+    // Get data from sessionStorage
     const mobileNumber = sessionStorage.getItem('mobileNumber');
     const planId = sessionStorage.getItem('planId');
     const price = sessionStorage.getItem('price');
@@ -15,10 +15,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const sms = sessionStorage.getItem('sms');
     const ottBenefits = sessionStorage.getItem('ottBenefits');
     const planName = sessionStorage.getItem('planName') || 'Data Plan';
+    const userEmail = sessionStorage.getItem('userEmail'); // Get stored email if available
 
     // Log the raw data from sessionStorage for debugging
     console.log("Raw data from sessionStorage:", {
-        mobileNumber, planId, price, data, validity, calls, sms, ottBenefits, planName
+        mobileNumber, planId, price, data, validity, calls, sms, ottBenefits, planName, userEmail
     });
 
     // Format mobile number with proper spacing
@@ -28,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return `+91 ${number.substring(0, 5)} ${number.substring(5)}`;
     }
 
-    // Display mobile number as text (not in an input box)
-    displayMobileNumber(mobileNumber);
+    // Display mobile number and email input field
+    displayMobileAndEmail(mobileNumber, userEmail);
 
     // Also update the mobile number in success modal for consistency
     const mobileNumberDisplay = document.getElementById('mobileNumberDisplay');
@@ -171,6 +172,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Function to validate email
+    function isValidEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
+
     // Payment processing function
     function processPayment() {
         // Get active payment method
@@ -189,6 +196,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Net Banking (' + activeBank.querySelector('.bank-name').textContent + ')' :
                     'Net Banking';
             }
+        }
+
+        // Get email from input field
+        const emailInput = document.getElementById('userEmail');
+        const userEmail = emailInput ? emailInput.value.trim() : '';
+
+        // Validate email if provided
+        if (userEmail && !isValidEmail(userEmail)) {
+            // Show error for invalid email
+            const emailError = document.getElementById('email-error');
+            if (emailError) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.style.display = 'block';
+            }
+            // Focus on email input
+            if (emailInput) emailInput.focus();
+            return;
+        }
+
+        // Clear any previous errors
+        const emailError = document.getElementById('email-error');
+        if (emailError) {
+            emailError.style.display = 'none';
         }
 
         // Show loading overlay
@@ -228,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.setItem('txnId', txnId);
         sessionStorage.setItem('txnDate', fullDateStr);
         sessionStorage.setItem('payMethod', paymentMethod);
+        if (userEmail) sessionStorage.setItem('userEmail', userEmail);
 
         // Ensure planId is a valid number
         let numericPlanId = 0;
@@ -252,7 +283,8 @@ document.addEventListener('DOMContentLoaded', function() {
             paymentMethod: paymentMethod + ' | TxnID: ' + txnId,
             paymentStatus: "Completed",  // Using exact enum value from your schema
             transactionDate: new Date().toISOString(),
-            expiryDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString()
+            expiryDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
+            email: userEmail // Include email for update or notification
         };
 
         console.log("Sending transaction data to backend:", rechargeData);
@@ -307,16 +339,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     inactiveStep.classList.remove('step-inactive');
                 }
 
-                // Ask user if they want an invoice email
-                if (confirm("Would you like to receive an invoice via email?")) {
-                    // Get user email
-                    const userEmail = prompt("Please enter your email address:", "");
-                    if (userEmail && userEmail.includes('@')) {
-                        // Send invoice email
-                        sendInvoiceEmail(rechargeData, userEmail, fullDateStr);
-                    } else {
-                        alert("Invalid email address. Invoice will not be sent.");
-                    }
+                // Send invoice email if email is provided
+                if (userEmail) {
+                    sendInvoiceEmail(rechargeData, userEmail, fullDateStr, planName || 'Data Plan');
                 }
             })
             .catch(error => {
@@ -333,12 +358,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to send invoice email
-    function sendInvoiceEmail(transactionData, userEmail, transactionDate) {
+    function sendInvoiceEmail(transactionData, userEmail, transactionDate, planName) {
         // Prepare data for the API call
         const invoiceData = {
             email: userEmail,
             mobileNumber: transactionData.mobileNumber,
-            planName: planName || '2GB/day Plan',
+            planName: planName,
             amount: transactionData.amount.toString(),
             transactionId: sessionStorage.getItem('txnId'),
             paymentMethod: sessionStorage.getItem('payMethod'),
@@ -364,11 +389,10 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log('Invoice email sent successfully:', data);
-                alert(`Invoice has been sent to ${userEmail}`);
             })
             .catch(error => {
                 console.error('Error sending invoice email:', error);
-                alert('Failed to send invoice email. Please try again later.');
+                // Don't alert the user about email failure - this is not critical
             });
     }
 
@@ -518,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper function to apply UI enhancements
     function applyUIEnhancements() {
-        // 1. Increase card size with CSS
+        // Add styles for the UI enhancements
         const style = document.createElement('style');
         style.textContent = `
             /* Enlarged card style */
@@ -586,14 +610,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 font-size: 0.6em !important;
             }
             
-            /* Mobile number display styling */
+            /* Mobile number and email display styling */
             .mobile-display {
                 display: flex;
                 align-items: center;
                 background: var(--white);
                 border-radius: var(--radius-md);
                 padding: 1rem;
-                margin-bottom: 1.5rem;
+                margin-bottom: 0.5rem;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             }
             
@@ -617,29 +641,79 @@ document.addEventListener('DOMContentLoaded', function() {
                 flex: 1;
             }
             
-            .change-link {
-                color: var(--primary);
-                font-weight: 600;
-                font-size: 0.875rem;
-                text-decoration: none;
-                cursor: pointer;
-                padding: 0.375rem 0.75rem;
+            .email-container {
+                display: flex;
+                align-items: center;
+                background: var(--white);
                 border-radius: var(--radius-md);
-                transition: all var(--transition-normal);
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             }
             
-            .change-link:hover {
-                background: var(--primary-bg);
+            .email-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                background: rgba(255, 56, 92, 0.1);
+                color: var(--primary);
+                border-radius: var(--radius-md);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
+                margin-right: 1rem;
+                flex-shrink: 0;
+            }
+            
+            .email-field {
+                flex: 1;
+                position: relative;
+            }
+            
+            .email-input {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            }
+            
+            .email-input:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+                outline: none;
+            }
+            
+            .email-error {
+                color: #dc3545;
+                font-size: 0.8rem;
+                margin-top: 0.2rem;
+                display: none;
+            }
+            
+            .email-label {
+                font-size: 0.85rem;
+                color: var(--gray);
+                margin-bottom: 0.25rem;
+                display: block;
+            }
+            
+            .email-desc {
+                font-size: 0.75rem;
+                color: var(--gray);
+                margin-top: 0.25rem;
+                display: block;
             }
         `;
         document.head.appendChild(style);
     }
 
-    // Helper function to display mobile number as text
-    function displayMobileNumber(mobileNumber) {
+    // Helper function to display mobile number and email input field
+    function displayMobileAndEmail(mobileNumber, savedEmail) {
         if (!mobileNumber) return;
 
-        // Get the mobile input directly - this is more reliable
+        // Get the mobile input directly
         const mobileInput = document.getElementById('mobileNumber');
         if (!mobileInput) return;
 
@@ -659,15 +733,51 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // Replace the container with our new display
+        // Create email input container
+        const emailContainer = document.createElement('div');
+        emailContainer.className = 'email-container';
+        emailContainer.innerHTML = `
+            <div class="email-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="email-field">
+                <label class="email-label">Email for Invoice</label>
+                <input type="email" id="userEmail" class="email-input" placeholder="Enter your email address" value="${savedEmail || ''}">
+                <div id="email-error" class="email-error"></div>
+                <span class="email-desc">Invoice will be sent to this email address</span>
+            </div>
+        `;
+
+        // Replace mobile container with our new elements
         mobileContainer.parentNode.replaceChild(mobileDisplay, mobileContainer);
 
-        // Add event listener to the newly created change button
-        const changeButton = document.getElementById('changeNumber');
-        if (changeButton) {
-            changeButton.addEventListener('click', function() {
-                // Navigate to recharge page - data is already in sessionStorage
-                window.location.href = 'Recharge.html';
+        // Insert email container after mobile display
+        mobileDisplay.parentNode.insertBefore(emailContainer, mobileDisplay.nextSibling);
+
+        // Add event listeners for email validation
+        const emailInput = document.getElementById('userEmail');
+        if (emailInput) {
+            emailInput.addEventListener('input', function() {
+                const emailError = document.getElementById('email-error');
+                if (emailError) {
+                    emailError.style.display = 'none';
+                }
+
+                // Store email in sessionStorage as user types
+                if (this.value.trim()) {
+                    sessionStorage.setItem('userEmail', this.value.trim());
+                }
+            });
+
+            emailInput.addEventListener('blur', function() {
+                const email = this.value.trim();
+                if (email && !isValidEmail(email)) {
+                    const emailError = document.getElementById('email-error');
+                    if (emailError) {
+                        emailError.textContent = 'Please enter a valid email address';
+                        emailError.style.display = 'block';
+                    }
+                }
             });
         }
     }
@@ -678,6 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // and payment information that's no longer needed
         const mobileNumber = sessionStorage.getItem('mobileNumber');
         const txnId = sessionStorage.getItem('txnId');
+        const userEmail = sessionStorage.getItem('userEmail');
 
         // Clear everything
         sessionStorage.clear();
@@ -686,5 +797,6 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.setItem('mobileNumber', mobileNumber);
         sessionStorage.setItem('lastRechargeTime', new Date().toISOString());
         sessionStorage.setItem('lastTransactionId', txnId);
+        if (userEmail) sessionStorage.setItem('userEmail', userEmail);
     }
 });
