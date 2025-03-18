@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Validation error:', error);
-                showError('An error occurred. Please try again.');
+                showError('Server Busy. Please try again.');
             } finally {
                 // Restore button state
                 proceedBtn.disabled = false;

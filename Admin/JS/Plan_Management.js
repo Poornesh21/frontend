@@ -125,8 +125,7 @@ async function fetchData(url, options = {}) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
 
-    // Inject debug window
-    createDebugPanel();
+
 
     document.querySelectorAll('.modal').forEach(modalEl => {
         modalEl.addEventListener('hidden.bs.modal', function () {
@@ -190,42 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Create debug panel
-function createDebugPanel() {
-    const debugPanel = document.createElement('div');
-    debugPanel.className = 'position-fixed bottom-0 end-0 p-3 bg-dark text-white rounded-top m-3';
-    debugPanel.style.zIndex = '1100';
-    debugPanel.style.maxWidth = '500px';
-    debugPanel.style.maxHeight = '300px';
-    debugPanel.style.overflow = 'auto';
-    debugPanel.style.boxShadow = '0 0 15px rgba(0,0,0,0.3)';
-
-    const header = document.createElement('div');
-    header.className = 'd-flex justify-content-between align-items-center mb-2';
-    header.innerHTML = `
-        <h6 class="m-0">Debug Panel</h6>
-        <div>
-            <button class="btn btn-sm btn-success me-1" id="debugLoginBtn">Login as Admin</button>
-            <button class="btn btn-sm btn-primary me-1" id="debugTestBtn">Test Endpoints</button>
-            <button class="btn btn-sm btn-outline-light" id="debugCloseBtn">Close</button>
-        </div>
-    `;
-
-    const content = document.createElement('div');
-    content.id = 'debugContent';
-    content.className = 'small';
-    content.innerHTML = 'Debug information will appear here...';
-
-    debugPanel.appendChild(header);
-    debugPanel.appendChild(content);
-    document.body.appendChild(debugPanel);
-
-    document.getElementById('debugCloseBtn').addEventListener('click', () => {
-        debugPanel.style.display = 'none';
-    });
-
-    document.getElementById('debugTestBtn').addEventListener('click', testEndpoints);
-    document.getElementById('debugLoginBtn').addEventListener('click', loginAsAdmin);
-}
 
 // Login as admin to get a valid token
 async function loginAsAdmin() {
@@ -410,7 +373,6 @@ async function fetchPlans() {
         renderTable();
 
         if (plansData.length > 0) {
-            showAlert(`Loaded ${plansData.length} plans successfully`, 'success');
         } else {
             showAlert('No plans found. You can add new plans.', 'info');
         }
@@ -464,13 +426,11 @@ async function fetchCategories() {
         }
 
         console.log("Mapped categories data:", categoriesData);
-        addDebugInfo(`Loaded ${categoriesData.length} categories`);
 
         if (categoriesData.length > 0) {
             populateCategoryDropdowns();
-            showAlert(`Loaded ${categoriesData.length} categories successfully`, 'success');
         } else {
-            showAlert('No categories found. Please add a new category to begin.', 'info');
+
             populateCategoryDropdowns();
         }
     } catch (error) {

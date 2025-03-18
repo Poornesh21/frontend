@@ -15,11 +15,6 @@
 <div class="bg-shape bg-shape-1"></div>
 <div class="bg-shape bg-shape-2"></div>
 
-<!-- Mobile Menu Toggle -->
-<button class="menu-toggle d-lg-none" id="menuToggle">
-  <i class="bi bi-list"></i>
-</button>
-
 <div class="d-flex">
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
@@ -41,24 +36,6 @@
           <span>Plan Management</span>
         </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#reminders">
-          <i class="bi bi-bell"></i>
-          <span>Reminders</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#reports">
-          <i class="bi bi-graph-up"></i>
-          <span>Reports</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#settings">
-          <i class="bi bi-gear"></i>
-          <span>Settings</span>
-        </a>
-      </li>
     </ul>
     <div class="sidebar-footer">
       <a class="btn btn-light btn-sm w-100" href="Login.html">
@@ -75,97 +52,29 @@
       <div class="page-header">
         <h1 class="h2 page-title">Dashboard</h1>
         <div class="d-flex gap-3">
-          <button class="btn btn-outline-primary" id="sendAllReminders">
-            <i class="bi bi-envelope me-2"></i>Send All Reminders
-          </button>
           <button class="btn btn-primary" id="refreshDashboard">
             <i class="bi bi-arrow-clockwise me-2"></i>Refresh
           </button>
         </div>
       </div>
 
-      <!-- Dashboard Cards -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="card shadow-hover glass-effect">
-            <div class="card-body text-center">
-              <i class="bi bi-cash-coin display-4 mb-3"></i>
-              <h5>Total Revenue</h5>
-              <p class="display-6" id="totalRevenue">₹0</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card shadow-hover glass-effect">
-            <div class="card-body text-center">
-              <i class="bi bi-cart-check display-4 mb-3"></i>
-              <h5>Total Transactions</h5>
-              <p class="display-6" id="totalTransactions">0</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card shadow-hover glass-effect">
-            <div class="card-body text-center">
-              <i class="bi bi-graph-up display-4 mb-3"></i>
-              <h5>Success Rate</h5>
-              <p class="display-6" id="successRate">0%</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card shadow-hover glass-effect">
-            <div class="card-body text-center">
-              <i class="bi bi-star display-4 mb-3"></i>
-              <h5>Popular Plan</h5>
-              <p class="display-6" id="popularPlan">N/A</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Expiring Plans with Reminders -->
+      <!-- Expiring Plans Section -->
       <div class="card shadow-hover mb-4 glass-effect">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
           <h6 class="m-0 font-weight-bold">
-            <i class="bi bi-clock-history me-2"></i>Expiring Plans (Next 3 Days)
+            <i class="bi bi-clock-history me-2"></i>Expiring Plans
           </h6>
           <span class="badge bg-warning" id="expiringPlansCount">0</span>
         </div>
         <div class="card-body p-3">
-          <!-- Reminder Toggle Section -->
-          <div class="reminder-container mb-3">
-            <div class="reminder-toggle">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="autoRemindersToggle" checked>
-                <label class="form-check-label" for="autoRemindersToggle">Auto-send reminders</label>
-              </div>
-              <span class="reminder-badge" id="remindersSent">0 sent today</span>
-            </div>
-            <div class="d-flex gap-2">
-              <select class="form-select form-select-sm" id="reminderTemplate">
-                <option value="1">Standard Template</option>
-                <option value="2">Promotional Template</option>
-                <option value="3">Urgent Template</option>
-              </select>
-              <button class="btn btn-sm btn-outline-primary" id="previewTemplate">
-                <i class="bi bi-eye me-1"></i>Preview
-              </button>
-            </div>
-          </div>
-
           <div class="table-responsive">
             <table class="table table-hover mb-0">
               <thead>
               <tr>
-                <th>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="selectAllUsers">
-                    <label class="form-check-label" for="selectAllUsers"></label>
-                  </div>
-                </th>
+                <th>S.No</th>
                 <th>Mobile Number</th>
                 <th>Plan</th>
+                <th>Price (₹)</th>
                 <th>Expiry Date</th>
                 <th>Days Remaining</th>
                 <th class="text-center">Actions</th>
@@ -175,14 +84,6 @@
               <!-- Expiring plans will be populated here -->
               </tbody>
             </table>
-          </div>
-        </div>
-        <div class="card-footer">
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="small-text" id="selectedCount">0 users selected</span>
-            <button class="btn btn-primary btn-sm" id="sendSelectedReminders" disabled>
-              <i class="bi bi-send me-1"></i>Send Selected Reminders
-            </button>
           </div>
         </div>
       </div>
@@ -225,7 +126,7 @@
             <tr>
               <th>Transaction ID</th>
               <th>Plan</th>
-              <th>Amount</th>
+              <th>Amount (₹)</th>
               <th>Date</th>
               <th>Status</th>
             </tr>
@@ -245,69 +146,6 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Reminder Preview Modal -->
-<div class="modal fade" id="reminderPreviewModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content glass-effect">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-envelope me-2"></i>Reminder Template Preview
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label">Subject Line</label>
-          <input type="text" class="form-control" id="reminderSubject" value="Your Mobi Comm Plan is Expiring Soon">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Message Content</label>
-          <textarea class="form-control" id="reminderContent" rows="6">Dear customer,
-
-Your mobile plan will expire soon. To ensure uninterrupted service, please renew your plan before the expiry date.
-
-Plan: {planName}
-Expiry Date: {expiryDate}
-Days Remaining: {daysRemaining}
-
-Renew now at: https://mobicomm.com/renew
-
-Thank you for choosing Mobi Comm.
-          </textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveTemplate">Save Template</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Reminder Sent Success Modal -->
-<div class="modal fade" id="reminderSentModal" tabindex="-1">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content glass-effect">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-check-circle me-2"></i>Success
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <div class="mb-4">
-          <i class="bi bi-envelope-check display-1 text-success"></i>
-        </div>
-        <h5>Reminders Sent!</h5>
-        <p id="reminderSentCount">0 reminders have been successfully sent.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
   </div>
