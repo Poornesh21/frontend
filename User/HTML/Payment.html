@@ -240,18 +240,23 @@
 
     .plan-detail-row {
       display: flex;
-      margin-bottom: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
     }
 
     .plan-detail-icon {
       color: var(--primary);
-      width: 20px;
-      margin-right: 0.5rem;
+      width: 24px;
+      margin-right: 0.75rem;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     .plan-detail-label {
       color: var(--gray);
       width: 80px;
+      flex-shrink: 0;
+      font-weight: 500;
     }
 
     .plan-detail-value {
@@ -405,7 +410,7 @@
   <div class="payment-details">
     <form id="paymentForm">
       <!-- Mobile Number Display -->
-      <div class="form-group">
+      <div class="form-group mb-3">
         <label class="form-label">Mobile Number</label>
         <div class="readonly-display">
           <span class="readonly-value" id="mobileNumberDisplay">+91 XXXXX XXXXX</span>
@@ -413,15 +418,18 @@
       </div>
 
       <!-- Email Input -->
-      <div class="form-group">
+      <div class="form-group mb-3">
         <label for="userEmail" class="form-label">Email for Invoice</label>
-        <input type="email" id="userEmail" class="form-control" placeholder="Enter your email address">
-        <div id="email-error" class="error-message"></div>
+        <div class="input-group">
+          <input type="email" id="userEmail" class="form-control" placeholder="Enter your email address">
+        </div>
+        <small class="form-text text-muted">Receipt and invoice will be sent to this email.</small>
+        <div id="email-error" class="error-message mt-1"></div>
       </div>
     </form>
 
     <!-- Plan Details -->
-    <div class="plan-details">
+    <div class="plan-details mb-4">
       <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Plan Details</h3>
 
       <div class="plan-detail-row">
@@ -449,7 +457,7 @@
       </div>
     </div>
 
-    <div class="payment-summary">
+    <div class="payment-summary mb-4">
       <div class="summary-row">
         <span class="summary-label">Plan Price</span>
         <span class="summary-value" id="planPrice">₹0.00</span>
@@ -461,7 +469,7 @@
     </div>
 
     <!-- Payment Methods Icons -->
-    <div class="payment-methods">
+    <div class="payment-methods mb-4">
       <img src="https://cdn.razorpay.com/static/assets/method/visa.svg" alt="Visa" class="payment-method-icon">
       <img src="https://cdn.razorpay.com/static/assets/method/mastercard.svg" alt="Mastercard" class="payment-method-icon">
       <img src="https://cdn.razorpay.com/static/assets/method/rupay.svg" alt="RuPay" class="payment-method-icon">
@@ -469,7 +477,7 @@
       <img src="https://cdn.razorpay.com/static/assets/method/netbanking.svg" alt="Netbanking" class="payment-method-icon">
     </div>
 
-    <div class="d-flex justify-content-between mt-3">
+    <div class="d-flex justify-content-between mt-4">
       <button id="backButton" class="back-button">
         <i class="fas fa-arrow-left me-2"></i>Back
       </button>
@@ -493,20 +501,6 @@
 
     // For debugging
     console.log('API URL for create order:', `${API_BASE_URL}/api/razorpay/create-order`);
-
-    // Test the API endpoint by making a simple GET request
-    fetch(`${API_BASE_URL}/api/categories`)
-            .then(response => {
-              console.log('Test API call response status:', response.status);
-              if (response.ok) {
-                console.log('API connection works!');
-              } else {
-                console.error('API connection failed');
-              }
-            })
-            .catch(error => {
-              console.error('API test error:', error);
-            });
 
     // Elements
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -539,7 +533,66 @@
     const calls = sessionStorage.getItem('calls');
     const sms = sessionStorage.getItem('sms') || '100/day';
     const ottBenefits = sessionStorage.getItem('ottBenefits');
-    const userEmail = sessionStorage.getItem('userEmail');
+
+    // First fetch user email from database based on mobile number
+    fetchUserEmail(mobileNumber);
+
+    // Function to fetch user email from the database
+    function fetchUserEmail(mobileNumber) {
+      if (!mobileNumber) {
+        console.error('No mobile number available');
+        initializeUI();
+        return;
+      }
+
+      console.log('Fetching user email for mobile number:', mobileNumber);
+
+      // Show loading indicator
+      showLoading(true);
+
+      // Call API to get user info
+      fetch(`${API_BASE_URL}/api/users/mobile/${mobileNumber}`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Failed to fetch user data');
+                }
+                return response.json();
+              })
+              .then(userData => {
+                console.log('User data retrieved:', userData);
+
+                // Check if user has an email in database
+                if (userData && userData.email) {
+                  userEmailInput.value = userData.email;
+                  console.log('Found email in database:', userData.email);
+                } else {
+                  // If no email in database, try from sessionStorage
+                  const sessionEmail = sessionStorage.getItem('userEmail');
+                  if (sessionEmail) {
+                    userEmailInput.value = sessionEmail;
+                    console.log('Using email from session:', sessionEmail);
+                  }
+                }
+
+                // Complete initialization
+                initializeUI();
+                showLoading(false);
+              })
+              .catch(error => {
+                console.error('Error fetching user data:', error);
+
+                // Still try to use email from sessionStorage if available
+                const sessionEmail = sessionStorage.getItem('userEmail');
+                if (sessionEmail) {
+                  userEmailInput.value = sessionEmail;
+                  console.log('Using email from session after API error:', sessionEmail);
+                }
+
+                // Complete initialization
+                initializeUI();
+                showLoading(false);
+              });
+    }
 
     // Format mobile number for display
     function formatMobileNumber(number) {
@@ -559,11 +612,6 @@
       if (mobileNumber) {
         mobileNumberDisplay.textContent = formatMobileNumber(mobileNumber);
         successMobileNumber.textContent = formatMobileNumber(mobileNumber);
-      }
-
-      // Set email if available
-      if (userEmail) {
-        userEmailInput.value = userEmail;
       }
 
       // Set plan details
@@ -598,7 +646,8 @@
         return;
       }
 
-      // Store email in sessionStorage
+      // Store email in sessionStorage for receipt purposes only
+      // This doesn't update the database, just used for email sending
       sessionStorage.setItem('userEmail', email);
 
       // Show loading overlay
@@ -697,7 +746,8 @@
         const response = await fetch(`${API_BASE_URL}/api/razorpay/verify-payment`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           body: JSON.stringify({
             razorpay_order_id: razorpay_order_id,
@@ -781,9 +831,6 @@
     homeButton.addEventListener('click', function() {
       window.location.href = 'Home.html';
     });
-
-    // Initialize the UI
-    initializeUI();
   });
 </script>
 </body>
