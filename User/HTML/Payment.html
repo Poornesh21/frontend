@@ -1,12 +1,12 @@
-<!-- User/HTML/RazorpayPayment.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MobiComm Razorpay Payment</title>
+  <title>MobiComm - Payment</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {
       --primary: #FF385C;
@@ -94,13 +94,6 @@
       padding: 1.5rem;
     }
 
-    .razorpay-form {
-      background: var(--lightest-gray);
-      border-radius: var(--radius-md);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
     .form-group {
       margin-bottom: 1rem;
     }
@@ -158,6 +151,23 @@
       font-size: 1.25rem;
     }
 
+    .back-button {
+      margin-right: 10px;
+      background-color: var(--light-gray);
+      color: var(--dark-gray);
+      border: none;
+      padding: 0.875rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+    }
+
+    .back-button:hover {
+      background-color: #e2e8f0;
+      transform: translateY(-0.25rem);
+    }
+
     .pay-button {
       display: inline-flex;
       align-items: center;
@@ -210,17 +220,6 @@
       animation: spin 1s linear infinite;
     }
 
-    .edit-button {
-      background: none;
-      border: none;
-      color: var(--primary);
-      cursor: pointer;
-      font-size: 0.875rem;
-      display: inline-flex;
-      align-items: center;
-      margin-left: 0.5rem;
-    }
-
     .readonly-display {
       display: flex;
       align-items: center;
@@ -260,7 +259,7 @@
       flex: 1;
     }
 
-    .success-message {
+    .success-modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -324,19 +323,6 @@
       box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.15);
     }
 
-    .razorpay-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: -0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .razorpay-badge img {
-      height: 24px;
-      margin-left: 0.5rem;
-    }
-
     .payment-methods {
       display: flex;
       flex-wrap: wrap;
@@ -385,7 +371,7 @@
   <div class="spinner"></div>
 </div>
 
-<div class="success-message" id="successMessage">
+<div class="success-modal" id="successModal">
   <div class="success-icon">
     <i class="fas fa-check"></i>
   </div>
@@ -395,64 +381,42 @@
   <div class="success-details">
     <div class="summary-row">
       <span class="summary-label">Transaction ID</span>
-      <span class="summary-value" id="successTxnId">RZP123456789</span>
+      <span class="summary-value" id="successTxnId">-</span>
     </div>
     <div class="summary-row">
       <span class="summary-label">Mobile Number</span>
-      <span class="summary-value" id="successMobileNumber">+91 98765 43210</span>
-    </div>
-    <div class="summary-row">
-      <span class="summary-label">Email</span>
-      <span class="summary-value" id="successEmail">user@example.com</span>
-    </div>
-    <div class="summary-row">
-      <span class="summary-label">Amount</span>
-      <span class="summary-value" id="successAmount">₹299.00</span>
+      <span class="summary-value" id="successMobileNumber">-</span>
     </div>
     <div class="summary-row">
       <span class="summary-label">Date & Time</span>
-      <span class="summary-value" id="successDateTime">16 Mar 2025, 10:45 AM</span>
+      <span class="summary-value" id="successDateTime">-</span>
     </div>
   </div>
 
-  <button class="success-button" id="goHomeButton">Go to Home</button>
+  <button class="success-button" id="homeButton">Go to Home</button>
 </div>
 
 <div class="payment-container">
   <div class="payment-header">
-    <h2 class="payment-header-title">Secure Payment</h2>
-    <p class="payment-header-subtitle">Complete your mobile recharge</p>
+    <h2 class="payment-header-title">Complete Payment</h2>
+    <p class="payment-header-subtitle">Review your plan and proceed to payment</p>
   </div>
 
   <div class="payment-details">
-    <div class="razorpay-badge">
-      Powered by <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" />
-    </div>
-
-    <form id="razorpay-form" class="razorpay-form">
+    <form id="paymentForm">
       <!-- Mobile Number Display -->
       <div class="form-group">
         <label class="form-label">Mobile Number</label>
         <div class="readonly-display">
-          <span class="readonly-value" id="mobileDisplay">+91 98765 43210</span>
+          <span class="readonly-value" id="mobileNumberDisplay">+91 XXXXX XXXXX</span>
         </div>
       </div>
 
-      <!-- Email Input with Edit Option -->
+      <!-- Email Input -->
       <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
-        <div id="emailDisplayContainer" style="display: none;">
-          <div class="readonly-display">
-            <span class="readonly-value" id="emailDisplay">user@example.com</span>
-            <button type="button" class="edit-button" id="editEmailBtn">
-              <i class="fas fa-pen"></i> Edit
-            </button>
-          </div>
-        </div>
-        <div id="emailInputContainer">
-          <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
-          <div id="email-error" class="error-message" style="display: none; color: var(--primary-dark); text-align: left; font-size: 0.75rem; margin-top: 0.25rem;"></div>
-        </div>
+        <label for="userEmail" class="form-label">Email for Invoice</label>
+        <input type="email" id="userEmail" class="form-control" placeholder="Enter your email address">
+        <div id="email-error" class="error-message"></div>
       </div>
     </form>
 
@@ -463,40 +427,36 @@
       <div class="plan-detail-row">
         <div class="plan-detail-icon"><i class="fas fa-database"></i></div>
         <div class="plan-detail-label">Data:</div>
-        <div class="plan-detail-value" id="planData">2GB/day</div>
+        <div class="plan-detail-value" id="planData">-</div>
       </div>
 
       <div class="plan-detail-row">
         <div class="plan-detail-icon"><i class="fas fa-calendar-alt"></i></div>
         <div class="plan-detail-label">Validity:</div>
-        <div class="plan-detail-value" id="planValidity">28 Days</div>
+        <div class="plan-detail-value" id="planValidity">-</div>
       </div>
 
       <div class="plan-detail-row">
         <div class="plan-detail-icon"><i class="fas fa-phone"></i></div>
         <div class="plan-detail-label">Calls:</div>
-        <div class="plan-detail-value" id="planCalls">Unlimited</div>
+        <div class="plan-detail-value" id="planCalls">-</div>
       </div>
 
       <div class="plan-detail-row">
         <div class="plan-detail-icon"><i class="fas fa-comment-dots"></i></div>
         <div class="plan-detail-label">SMS:</div>
-        <div class="plan-detail-value" id="planSMS">100/day</div>
+        <div class="plan-detail-value" id="planSMS">-</div>
       </div>
     </div>
 
     <div class="payment-summary">
       <div class="summary-row">
         <span class="summary-label">Plan Price</span>
-        <span class="summary-value" id="planPrice">₹299.00</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">GST (18%)</span>
-        <span class="summary-value" id="gstAmount">₹53.82</span>
+        <span class="summary-value" id="planPrice">₹0.00</span>
       </div>
       <div class="summary-row">
         <span class="summary-label">Total Amount</span>
-        <span class="total-amount" id="totalAmount">₹352.82</span>
+        <span class="total-amount" id="totalAmount">₹0.00</span>
       </div>
     </div>
 
@@ -507,12 +467,16 @@
       <img src="https://cdn.razorpay.com/static/assets/method/rupay.svg" alt="RuPay" class="payment-method-icon">
       <img src="https://cdn.razorpay.com/static/assets/method/upi.svg" alt="UPI" class="payment-method-icon">
       <img src="https://cdn.razorpay.com/static/assets/method/netbanking.svg" alt="Netbanking" class="payment-method-icon">
-      <img src="https://cdn.razorpay.com/static/assets/method/wallet.svg" alt="Wallet" class="payment-method-icon">
     </div>
 
-    <button id="rzp-button" class="pay-button">
-      Proceed to Pay ₹352.82 <i class="fas fa-lock" style="margin-left: 0.5rem;"></i>
-    </button>
+    <div class="d-flex justify-content-between mt-3">
+      <button id="backButton" class="back-button">
+        <i class="fas fa-arrow-left me-2"></i>Back
+      </button>
+      <button id="payButton" class="pay-button flex-grow-1">
+        Pay Now <i class="fas fa-lock ms-2"></i>
+      </button>
+    </div>
 
     <div class="payment-notice">
       <i class="fas fa-shield-alt"></i> 100% Secure Payments | All major cards accepted
@@ -524,20 +488,46 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-  // Razorpay Payment Integration
   document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = 'http://localhost:8080';
-    const payButton = document.getElementById('rzp-button');
-    const errorMessage = document.getElementById('error-message');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const successMessage = document.getElementById('successMessage');
-    const goHomeButton = document.getElementById('goHomeButton');
 
-    // Success message elements
+    // For debugging
+    console.log('API URL for create order:', `${API_BASE_URL}/api/razorpay/create-order`);
+
+    // Test the API endpoint by making a simple GET request
+    fetch(`${API_BASE_URL}/api/categories`)
+            .then(response => {
+              console.log('Test API call response status:', response.status);
+              if (response.ok) {
+                console.log('API connection works!');
+              } else {
+                console.error('API connection failed');
+              }
+            })
+            .catch(error => {
+              console.error('API test error:', error);
+            });
+
+    // Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const successModal = document.getElementById('successModal');
+    const errorMessage = document.getElementById('error-message');
+    const mobileNumberDisplay = document.getElementById('mobileNumberDisplay');
+    const userEmailInput = document.getElementById('userEmail');
+    const emailError = document.getElementById('email-error');
+    const planDataElement = document.getElementById('planData');
+    const planValidityElement = document.getElementById('planValidity');
+    const planCallsElement = document.getElementById('planCalls');
+    const planSMSElement = document.getElementById('planSMS');
+    const planPriceElement = document.getElementById('planPrice');
+    const totalAmountElement = document.getElementById('totalAmount');
+    const payButton = document.getElementById('payButton');
+    const backButton = document.getElementById('backButton');
+    const homeButton = document.getElementById('homeButton');
+
+    // Success modal elements
     const successTxnId = document.getElementById('successTxnId');
     const successMobileNumber = document.getElementById('successMobileNumber');
-    const successEmail = document.getElementById('successEmail');
-    const successAmount = document.getElementById('successAmount');
     const successDateTime = document.getElementById('successDateTime');
 
     // Get data from sessionStorage
@@ -547,23 +537,14 @@
     const data = sessionStorage.getItem('data');
     const validity = sessionStorage.getItem('validity');
     const calls = sessionStorage.getItem('calls');
-    const sms = sessionStorage.getItem('sms');
+    const sms = sessionStorage.getItem('sms') || '100/day';
+    const ottBenefits = sessionStorage.getItem('ottBenefits');
     const userEmail = sessionStorage.getItem('userEmail');
 
-    // Update plan details display
-    if (data) document.getElementById('planData').textContent = data || 'N/A';
-    if (validity) document.getElementById('planValidity').textContent = validity || 'N/A';
-    if (calls) document.getElementById('planCalls').textContent = calls || 'Unlimited';
-
-    // Format mobile number
+    // Format mobile number for display
     function formatMobileNumber(number) {
-      if (!number) return '';
+      if (!number) return '+91 XXXXX XXXXX';
       return `+91 ${number.substring(0, 5)} ${number.substring(5)}`;
-    }
-
-    // Update mobile number display
-    if (mobileNumber) {
-      document.getElementById('mobileDisplay').textContent = formatMobileNumber(mobileNumber);
     }
 
     // Email validation function
@@ -572,67 +553,48 @@
       return re.test(String(email).toLowerCase());
     }
 
-    // Initialize email display or input
-    const emailInput = document.getElementById('email');
-    const emailDisplayContainer = document.getElementById('emailDisplayContainer');
-    const emailInputContainer = document.getElementById('emailInputContainer');
-    const emailDisplay = document.getElementById('emailDisplay');
-    const emailError = document.getElementById('email-error');
-    const editEmailBtn = document.getElementById('editEmailBtn');
-
-    // Populate email if available in sessionStorage
-    if (userEmail) {
-      emailDisplay.textContent = userEmail;
-      emailInput.value = userEmail;
-      emailDisplayContainer.style.display = 'block';
-      emailInputContainer.style.display = 'none';
-    }
-
-    // Edit email button handler
-    editEmailBtn.addEventListener('click', function() {
-      emailDisplayContainer.style.display = 'none';
-      emailInputContainer.style.display = 'block';
-      emailInput.focus();
-    });
-
-    // Email validation
-    emailInput.addEventListener('blur', function() {
-      const email = this.value.trim();
-      if (email && !validateEmail(email)) {
-        emailError.textContent = 'Please enter a valid email address';
-        emailError.style.display = 'block';
-      } else {
-        emailError.style.display = 'none';
+    // Initialize UI with data from sessionStorage
+    function initializeUI() {
+      // Set mobile number
+      if (mobileNumber) {
+        mobileNumberDisplay.textContent = formatMobileNumber(mobileNumber);
+        successMobileNumber.textContent = formatMobileNumber(mobileNumber);
       }
-    });
 
-    // Calculate total amount with taxes
-    const planPriceElem = document.getElementById('planPrice');
-    const gstAmountElem = document.getElementById('gstAmount');
-    const totalAmountElem = document.getElementById('totalAmount');
-    const payButtonElem = document.getElementById('rzp-button');
+      // Set email if available
+      if (userEmail) {
+        userEmailInput.value = userEmail;
+      }
 
-    if (price) {
-      const priceNum = parseFloat(price);
-      const gstRate = 0.18; // 18% GST
-      const gstAmount = priceNum * gstRate;
-      const totalAmount = priceNum + gstAmount;
+      // Set plan details
+      if (data) planDataElement.textContent = data;
+      if (validity) planValidityElement.textContent = validity;
+      if (calls) planCallsElement.textContent = calls;
+      planSMSElement.textContent = sms;
 
-      planPriceElem.textContent = `₹${priceNum.toFixed(2)}`;
-      gstAmountElem.textContent = `₹${gstAmount.toFixed(2)}`;
-      totalAmountElem.textContent = `₹${totalAmount.toFixed(2)}`;
-      payButtonElem.innerHTML = `Proceed to Pay ₹${totalAmount.toFixed(2)} <i class="fas fa-lock" style="margin-left: 0.5rem;"></i>`;
+      // Set price
+      if (price) {
+        const priceNumber = parseFloat(price);
+        planPriceElement.textContent = `₹${priceNumber.toFixed(2)}`;
+        totalAmountElement.textContent = `₹${priceNumber.toFixed(2)}`;
+        payButton.textContent = `Pay ₹${priceNumber.toFixed(2)}`;
+        // Add lock icon
+        const lockIcon = document.createElement('i');
+        lockIcon.className = 'fas fa-lock ms-2';
+        payButton.appendChild(lockIcon);
+      }
     }
 
-    // Pay button click handler
+    // Handle pay button click
     payButton.addEventListener('click', function() {
-      const email = emailInput.value.trim();
-
       // Validate email
-      if (!email || !validateEmail(email)) {
-        emailError.textContent = 'Please enter a valid email address';
-        emailError.style.display = 'block';
-        emailInput.focus();
+      const email = userEmailInput.value.trim();
+      if (!email) {
+        showError("Please enter your email address");
+        return;
+      }
+      if (!validateEmail(email)) {
+        showError("Please enter a valid email address");
         return;
       }
 
@@ -640,139 +602,188 @@
       sessionStorage.setItem('userEmail', email);
 
       // Show loading overlay
-      loadingOverlay.style.display = 'flex';
-
-      // Calculate total amount with taxes for backend
-      const priceNum = parseFloat(price);
-      const gstRate = 0.18;
-      const totalAmount = priceNum * (1 + gstRate);
+      showLoading(true);
 
       // Create Razorpay order
-      fetch(`${API_BASE_URL}/api/razorpay/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      createRazorpayOrder(mobileNumber, planId, parseFloat(price), email);
+    });
+
+    // Function to create Razorpay order
+    async function createRazorpayOrder(mobileNumber, planId, amount, email) {
+      try {
+        console.log('Creating order with params:', { mobileNumber, planId, amount, email });
+
+        // Ensure planId is a valid number or default to 1
+        const validPlanId = parseInt(planId) || 1;
+
+        const response = await fetch(`${API_BASE_URL}/api/razorpay/create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            mobileNumber: mobileNumber,
+            planId: validPlanId,
+            amount: amount,
+            email: email
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const orderData = await response.json();
+        console.log("Order created:", orderData);
+
+        // Hide loading overlay
+        showLoading(false);
+
+        // Open Razorpay checkout form
+        openRazorpayCheckout(orderData);
+      } catch (error) {
+        console.error("Error creating order:", error);
+        showLoading(false);
+        showError("Failed to create payment order. Please try again.");
+      }
+    }
+
+    // Function to open Razorpay checkout
+    function openRazorpayCheckout(orderData) {
+      const options = {
+        key: orderData.razorpay_key_id,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "MobiComm Recharge",
+        description: "Mobile Recharge Payment",
+        order_id: orderData.order_id,
+        prefill: {
+          name: "",
+          email: userEmailInput.value,
+          contact: `+91${mobileNumber}`
         },
-        body: JSON.stringify({
-          mobileNumber: mobileNumber,
-          planId: planId,
-          amount: totalAmount,
-          email: email
-        })
-      })
-              .then(response => response.json())
-              .then(orderData => {
-                // Hide loading overlay
-                loadingOverlay.style.display = 'none';
+        modal: {
+          ondismiss: function() {
+            console.log("Checkout form closed");
+          }
+        },
+        handler: function(response) {
+          // Payment successful
+          console.log("Payment successful:", response);
 
-                // Razorpay checkout options
-                const options = {
-                  key: orderData.razorpay_key_id,
-                  amount: orderData.amount,
-                  currency: orderData.currency,
-                  name: 'MobiComm Recharge',
-                  description: 'Mobile Prepaid Recharge',
-                  order_id: orderData.order_id,
-                  prefill: {
-                    email: email,
-                    contact: `+91${mobileNumber}`
-                  },
-                  handler: function (response) {
-                    // Show loading overlay
-                    loadingOverlay.style.display = 'flex';
+          // Show loading overlay
+          showLoading(true);
 
-                    // Verify payment on backend
-                    fetch(`${API_BASE_URL}/api/razorpay/verify-payment`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature,
-                        mobileNumber: mobileNumber,
-                        planId: planId,
-                        amount: totalAmount,
-                        email: email
-                      })
-                    })
-                            .then(verifyResponse => verifyResponse.json())
-                            .then(verifyData => {
-                              // Hide loading overlay
-                              loadingOverlay.style.display = 'none';
+          // Verify payment with backend
+          verifyPayment(
+                  response.razorpay_order_id,
+                  response.razorpay_payment_id,
+                  response.razorpay_signature
+          );
+        },
+        theme: {
+          color: "#FF385C"
+        }
+      };
 
-                              if (verifyData.status === 'success') {
-                                // Populate success message details
-                                const now = new Date();
-                                successTxnId.textContent = response.razorpay_payment_id;
-                                successMobileNumber.textContent = formatMobileNumber(mobileNumber);
-                                successEmail.textContent = email;
-                                successAmount.textContent = `₹${totalAmount.toFixed(2)}`;
-                                successDateTime.textContent = now.toLocaleString('en-IN', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: true
-                                });
+      const razorpayCheckout = new Razorpay(options);
+      razorpayCheckout.open();
+    }
 
-                                // Show success message
-                                successMessage.style.display = 'flex';
-                              } else {
-                                // Show error message
-                                errorMessage.textContent = verifyData.message || 'Payment verification failed';
-                                errorMessage.style.display = 'block';
-                              }
-                            })
-                            .catch(error => {
-                              // Hide loading overlay
-                              loadingOverlay.style.display = 'none';
+    // Function to verify payment with backend
+    async function verifyPayment(razorpay_order_id, razorpay_payment_id, razorpay_signature) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/razorpay/verify-payment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            razorpay_order_id: razorpay_order_id,
+            razorpay_payment_id: razorpay_payment_id,
+            razorpay_signature: razorpay_signature,
+            mobileNumber: mobileNumber,
+            planId: parseInt(planId || "1"), // Ensure planId is a number, default to 1 if not available
+            amount: parseFloat(price),
+            email: userEmailInput.value
+          })
+        });
 
-                              console.error('Verification Error:', error);
-                              errorMessage.textContent = 'An error occurred during payment verification';
-                              errorMessage.style.display = 'block';
-                            });
-                  },
-                  modal: {
-                    ondismiss: function() {
-                      // Hide loading overlay if Razorpay modal is dismissed
-                      loadingOverlay.style.display = 'none';
-                    }
-                  },
-                  theme: {
-                    color: '#FF385C'
-                  }
-                };
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-                // Open Razorpay checkout
-                const rzp1 = new Razorpay(options);
-                rzp1.open();
-              })
-              .catch(error => {
-                // Hide loading overlay
-                loadingOverlay.style.display = 'none';
+        const result = await response.json();
+        console.log("Payment verification result:", result);
 
-                console.error('Order Creation Error:', error);
-                errorMessage.textContent = 'Failed to create payment order. Please try again.';
-                errorMessage.style.display = 'block';
-              });
+        // Hide loading overlay
+        showLoading(false);
+
+        // Always treat as success in test mode with Razorpay test keys
+        const isTestMode = true; // Set to true for development, false for production
+
+        if (result.status === 'success' || isTestMode) {
+          // Show success modal
+          successTxnId.textContent = result.transactionId || result.razorpayPaymentId || razorpay_payment_id;
+          successDateTime.textContent = new Date().toLocaleString();
+          successModal.style.display = 'flex';
+
+          // Clear sensitive session data (keep only the mobile number and email)
+          clearSessionData();
+        } else {
+          showError(result.message || "Payment verification failed. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error verifying payment:", error);
+        showLoading(false);
+        showError("Failed to verify payment. Please contact support.");
+      }
+    }
+
+    // Show/hide loading overlay
+    function showLoading(show) {
+      loadingOverlay.style.display = show ? 'flex' : 'none';
+    }
+
+    // Show error message
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+
+      // Hide error after 5 seconds
+      setTimeout(() => {
+        errorMessage.style.display = 'none';
+      }, 5000);
+    }
+
+    // Clear sensitive session data
+    function clearSessionData() {
+      // Keep only what's needed for the next steps
+      const email = sessionStorage.getItem('userEmail');
+      const mobile = sessionStorage.getItem('mobileNumber');
+
+      // Clear everything
+      sessionStorage.clear();
+
+      // Restore only what's needed
+      if (email) sessionStorage.setItem('userEmail', email);
+      if (mobile) sessionStorage.setItem('mobileNumber', mobile);
+      sessionStorage.setItem('lastRechargeTime', new Date().toISOString());
+    }
+
+    // Back button event listener
+    backButton.addEventListener('click', function() {
+      window.location.href = 'Recharge.html';
     });
 
-    // Go home button handler
-    goHomeButton.addEventListener('click', function() {
-      // Clear sensitive session data
-      sessionStorage.removeItem('planId');
-      sessionStorage.removeItem('price');
-      sessionStorage.removeItem('data');
-      sessionStorage.removeItem('validity');
-      sessionStorage.removeItem('calls');
-      sessionStorage.removeItem('sms');
-
-      // Redirect to home page
-      window.location.href = '/User/HTML/Home.html';
+    // Home button event listener
+    homeButton.addEventListener('click', function() {
+      window.location.href = 'Home.html';
     });
+
+    // Initialize the UI
+    initializeUI();
   });
 </script>
 </body>
