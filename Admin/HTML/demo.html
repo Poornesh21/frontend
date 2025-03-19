@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Mobi Comm Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #FF385C;
+            --primary-light: #FF6B89;
+            --primary-dark: #E01E4C;
+            --primary-gradient: linear-gradient(135deg, #FF385C 0%, #FF6B89 100%);
+            --primary-transparent: rgba(255, 56, 92, 0.1);
+            --secondary-color: #333333;
+            --secondary-light: #4a4a4a;
+            --secondary-dark: #1a1a1a;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-tertiary: #808080;
+            --white: #ffffff;
+            --background-color: #f9fafb;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --success-color: #0f853d;
+            --warning-color: #e67e22;
+            --danger-color: #d35400;
+            --info-color: #2980b9;
+            --border-color: rgba(230, 232, 240, 0.6);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --transition-speed: 0.25s;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Baloo Bhaijaan 2', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f9fafb 0%, #FFF5F7 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Animated Background Shapes */
+        .bg-shape {
+            position: fixed;
+            z-index: -1;
+        }
+
+        .bg-shape-1 {
+            top: 0;
+            right: 0;
+            width: 25vw;
+            height: 25vw;
+            opacity: 0.15;
+            border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+            background-color: var(--primary-color);
+            animation: morph 15s linear infinite alternate;
+        }
+
+        .bg-shape-2 {
+            bottom: 0;
+            left: 10%;
+            width: 30vw;
+            height: 30vw;
+            opacity: 0.1;
+            border-radius: 62% 38% 46% 54% / 60% 63% 37% 40%;
+            background-color: var(--primary-color);
+            animation: morph 12s linear infinite alternate;
+        }
+
+        @keyframes morph {
+            0% {
+                border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%;
+            }
+            100% {
+                border-radius: 40% 60%;
+            }
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .font-weight-semibold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 700 !important;
+        }
+
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+
+        .small-text {
+            font-size: 0.875rem;
+            letter-spacing: 0.01em;
+        }
+
+        /* Glass Effect */
+        .glass-effect {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.07);
+            border-radius: var(--border-radius);
+            transition: all var(--transition-speed);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(150deg, rgba(255, 56, 92, 0.95) 0%, rgba(224, 30, 76, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1030;
+            transition: all var(--transition-speed);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            font-size: 1.6rem;
+            font-weight: 800;
+            padding: 1.5rem;
+            text-align: center;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-brand i {
+            color: var(--white);
+            margin-right: 0.5rem;
+        }
+
+        .sidebar-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1rem 1.5rem;
+        }
+
+        .sidebar .nav-item {
+            margin-bottom: 0.5rem;
+            padding: 0 1rem;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.9rem 1.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 1rem;
+            transition: all var(--transition-speed);
+            position: relative;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--white);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        /* Content Area */
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: margin var(--transition-speed);
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            height: 4px;
+            width: 40px;
+            background: var(--primary-color);
+            border-radius: 50px;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            box-shadow: var(--shadow-md);
+            border-radius: 1rem;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            overflow: hidden;
+            background-color: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-bottom: 1.5rem;
+        }
+
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            background-color: transparent;
+            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* Statistics Cards */
+        .stat-card {
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all var(--transition-speed);
+        }
+
+        .stat-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-transparent);
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+        }
+
+        .stat-card p {
+            color: var(--text-tertiary);
+            margin-bottom: 0;
+        }
+
+        /* Buttons */
+        .btn {
+            font-weight: 500;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all var(--transition-speed);
+            letter-spacing: 0.01em;
+            text-transform: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 1s;
+        }
+
+        .btn:active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            box-shadow: 0 3px 10px rgba(255, 56, 92, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 56, 92, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border: none;
+            color: white;
+            box-shadow: 0 3px 10px rgba(51, 51, 51, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(51, 51, 51, 0.4);
+        }
+
+        .btn-light {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-light:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Tables */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            padding: 1.25rem 1.5rem;
+            font-size: 0.9rem;
+            background-color: var(--primary-color);
+            color: white;
+            white-space: nowrap;
+            border-top: none;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .table thead th:first-child {
+            border-top-left-radius: 0.5rem;
+        }
+
+        .table thead th:last-child {
+            border-top-right-radius: 0.5rem;
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            vertical-align: middle;
+            border-color: var(--border-color);
+            font-weight: 400;
+        }
+
+        .table-hover tbody tr {
+            transition: background-color var(--transition-speed);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--primary-transparent);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5em 0.75em;
+            font-weight: 600;
+            border-radius: 0.5rem;
+        }
+
+        .bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+
+        .bg-success {
+            background-color: var(--success-color) !important;
+        }
+
+        .bg-danger {
+            background-color: var(--danger-color) !important;
+        }
+
+        .bg-info {
+            background-color: var(--info-color) !important;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 56, 92, 0.1);
+            color: var(--primary-color);
+            transition: all var(--transition-speed);
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(255, 56, 92, 0.3);
+        }
+
+        /* Status Indicators */
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+        }
+
+        .status-warning {
+            background-color: var(--warning-color);
+        }
+
+        .status-danger {
+            background-color: var(--danger-color);
+        }
+
+        /* Modal Customization */
+        .modal-content {
+            border: none;
+            border-radius: 1.25rem;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+            padding: 1.75rem;
+        }
+
+        .modal-header .btn-close {
+            color: white;
+            opacity: 0.8;
+            filter: brightness(300%);
+        }
+
+        .modal-body {
+            padding: 1.75rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 1.75rem;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Recent Activity */
+        .activity-item {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color var(--transition-speed);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background-color: var(--primary-transparent);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .activity-success {
+            background-color: rgba(15, 133, 61, 0.1);
+            color: var(--success-color);
+        }
+
+        .activity-warning {
+            background-color: rgba(230, 126, 34, 0.1);
+            color: var(--warning-color);
+        }
+
+        .activity-info {
+            background-color: rgba(41, 128, 185, 0.1);
+            color: var(--info-color);
+        }
+
+        .activity-danger {
+            background-color: rgba(211, 84, 0, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Custom Scroll */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            :root {
+                --sidebar-width: 0px;
+            }
+
+            .sidebar {
+                left: -280px;
+                transition: left var(--transition-speed);
+            }
+
+            .sidebar.sidebar-mobile {
+                left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            /* Mobile menu toggle button */
+            .menu-toggle {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1040;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                background: var(--primary-color);
+                box-shadow: 0 3px 10px rgba(255, 56, 92, 0.3);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: none;
+                cursor: pointer;
+                transition: all var(--transition-speed);
+                font-size: 1.2rem;
+            }
+
+            .menu-toggle:hover {
+                background: var(--primary-dark);
+                transform: scale(1.05);
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header .d-flex {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1.5rem;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-shape bg-shape-1"></div>
+<div class="bg-shape bg-shape-2"></div>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand text-white">
+            <i class="bi bi-broadcast-pin me-2"></i>
+            <span>MOBI COMM</span>
+        </div>
+        <hr class="sidebar-divider">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="Dashboard.html">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Plan_Management.html">
+                    <i class="bi bi-list-check"></i>
+                    <span>Plan Management</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="bi bi-people"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a class="btn btn-light btn-sm w-100" href="Login.html">
+                <i class="bi bi-box-arrow-left me-1"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 content">
+        <div class="container-fluid fade-in">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="h2 page-title">Dashboard</h1>
+                    <p class="text-muted">Welcome back, Admin. Here's what's happening today.</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-primary" id="refreshDashboard">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card glass-effect shadow-hover h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Total Users</h6>
+                                    <h3 class="font-weight-bold mb-0">24,512</h3>
+                                    <p class="small text-success mb-0 mt-2">
+                                        <i class="bi bi-arrow-up"></i> 8.3% from last month
+                                    </p>
+                                </div>
+                                <div class="stat-card-icon">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card glass-effect shadow-hover h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Active Plans</h6>
+                                    <h3 class="font-weight-bold mb-0">18,649</h3>
+                                    <p class="small text-success mb-0 mt-2">
+                                        <i class="bi bi-arrow-up"></i> 4.2% from last month
+                                    </p>
+                                </div>
+                                <div class="stat-card-icon">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card glass-effect shadow-hover h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Expiring Soon</h6>
+                                    <h3 class="font-weight-bold mb-0" id="dashboardExpiringCount">247</h3>
+                                    <p class="small text-warning mb-0 mt-2">
+                                        <i class="bi bi-exclamation-triangle"></i> Needs attention
+                                    </p>
+                                </div>
+                                <div class="stat-card-icon" style="background-color: rgba(230, 126, 34, 0.1); color: var(--warning-color);">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card glass-effect shadow-hover h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Monthly Revenue</h6>
+                                    <h3 class="font-weight-bold mb-0">₹3.6M</h3>
+                                    <p class="small text-success mb-0 mt-2">
+                                        <i class="bi bi-arrow-up"></i> 12.7% from last month
+                                    </p>
+                                </div>
+                                <div class="stat-card-icon">
+                                    <i class="bi bi-currency-rupee"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiring Plans Section -->
+            <div class="card shadow-hover mb-4 glass-effect">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="bi bi-clock-history me-2 text-warning"></i>Expiring Plans
+                    </h6>
+                    <span class="badge bg-warning" id="expiringPlansCount">247</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Mobile Number</th>
+                                <th>Plan</th>
+                                <th>Price (₹)</th>
+                                <th>Expiry Date</th>
+                                <th>Days Remaining</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="expiringPlansBody">
+                            <!-- Sample data for visualization -->
+                            <tr>
+                                <td>1</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="status-dot status-active"></div>
+                                        <span>8765432109</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">Basic 30 Days</span>
+                                </td>
+                                <td>₹249</td>
+                                <td>Mar 24, 2025</td>
+                                <td>
+                                    <span class="badge bg-danger text-white">4 days</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="View History">
+                                            <i class="bi bi-clock-history"></i>
+                                        </button>
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="Send Reminder">
+                                            <i class="bi bi-bell"></i>
+                                        </button>
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="Renew Plan">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="status-dot status-active"></div>
+                                        <span>9876543210</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">Premium 90 Days</span>
+                                </td>
+                                <td>₹599</td>
+                                <td>Mar 29, 2025</td>
+                                <td>
+                                    <span class="badge bg-warning text-dark">9 days</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="View History">
+                                            <i class="bi bi-clock-history"></i>
+                                        </button>
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="Send Reminder">
+                                            <i class="bi bi-bell"></i>
+                                        </button>
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="Renew Plan">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="status-dot status-active"></div>
+                                        <span>7654321098</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">Premium 90 Days</span>
+                                </td>
+                                <td>₹599</td>
+                                <td>Mar 26, 2025</td>
+                                <td>
+                                    <span class="badge bg-warning text-dark">6 days</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="View History">
+                                            <i class="bi bi-clock-history"></i>
+                                        </button>
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="Send Reminder">
+                                            <i class="bi bi-bell"></i>
+                                        </button>
+                                        <button class="action-btn" data-bs-toggle="tooltip" title="Renew Plan">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Showing 3 of 247 expiring plans</span>
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All <i class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-hover glass-effect h-100">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold">
+                                <i class="bi bi-activity me-2 text-primary"></i>Recent Activities
+                            </h6>
+                            <a href="#" class="small">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon activity-success me-3">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="small mb-1 font-weight-semibold">New plan activated</h6>
+                                    <p class="small mb-0 text-muted">User #43829 activated Premium 90 Days plan</p>
+                                    <small class="text-muted">Today, 09:45 AM</small>
+                                </div>
+                            </div>
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon activity-warning me-3">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="small mb-1 font-weight-semibold">Plan expiration reminder sent</h6>
+                                    <p class="small mb-0 text-muted">Automated reminder sent to 42 users</p>
+                                    <small class="text-muted">Today, 08:30 AM</small>
+                                </div>
+                            </div>
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon activity-info me-3">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="small mb-1 font-weight-semibold">New promotion launched</h6>
+                                    <p class="small mb-0 text-muted">Summer Special Offer activated system-wide</p>
+                                    <small class="text-muted">Yesterday, 04:15 PM</small>
+                                </div>
+                            </div>
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon activity-danger me-3">
+                                    <i class="bi bi-x-circle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="small mb-1 font-weight-semibold">Payment failure alert</h6>
+                                    <p class="small mb-0 text-muted">3 users failed to process automatic renewal</p>
+                                    <small class="text-muted">Yesterday, 02:34 PM</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-hover glass-effect h-100">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold">
+                                <i class="bi bi-graph-up me-2 text-primary"></i>Monthly Active Plans
+                            </h6>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="planTypeDropdown" data-bs-toggle="dropdown">
+                                    All Plans
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="planTypeDropdown">
+                                    <li><a class="dropdown-item" href="#">All Plans</a></li>
+                                    <li><a class="dropdown-item" href="#">Basic Plans</a></li>
+                                    <li><a class="dropdown-item" href="#">Premium Plans</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="position: relative; height:250px;">
+                                <!-- Chart will be rendered here -->
+                                <canvas id="monthlyActivePlansChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-5 mb-3">
+                <div class="text-center text-muted small">
+                    <p class="mb-1">© 2025 Mobi Comm. All rights reserved.</p>
+                    <p class="mb-0">Version 2.1.4</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Menu Toggle Button (visible on small screens) -->
+<button class="menu-toggle d-lg-none" id="menuToggle">
+    <i class="bi bi-list"></i>
+</button>
+
+<!-- JavaScript Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Initialize Tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        // Enable tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-mobile');
+            });
+        }
+
+        // Sample Chart Data
+        const ctx = document.getElementById('monthlyActivePlansChart');
+        if (ctx) {
+            const monthlyPlansChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [
+                        {
+                            label: 'Basic Plans',
+                            data: [8450, 8940, 9320, 9760, 10200, 11500, 11980, 12400, 12900],
+                            borderColor: '#FF6B89',
+                            backgroundColor: 'rgba(255, 107, 137, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Premium Plans',
+                            data: [4200, 4560, 4890, 5100, 5670, 6200, 6500, 6780, 7100],
+                            borderColor: '#2980b9',
+                            backgroundColor: 'rgba(41, 128, 185, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Refresh Dashboard Button
+        const refreshButton = document.getElementById('refreshDashboard');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                // Add a rotating animation to the refresh icon
+                this.querySelector('i').classList.add('fa-spin');
+
+                // Simulate API call with a timeout
+                setTimeout(() => {
+                    this.querySelector('i').classList.remove('fa-spin');
+                    // Show a toast or notification that data is refreshed
+                    alert('Dashboard data has been refreshed!');
+                }, 1000);
+            });
+        }
+    });
+</script>
+</body>
+</html>
