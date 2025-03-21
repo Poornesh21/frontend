@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${plan.mobileNumber}</td>
-                    <td>${plan.planName || 'N/A'}</td>
-                    <td>0</td>
+                    <td>${plan.planName || 'Uncategorized'}</td>
+                    <td>₹0</td>
                     <td>${expiryDate.toLocaleDateString()}</td>
                     <td class="${daysRemaining <= 2 ? 'text-danger' : 'text-warning'}">${daysRemaining} days</td>
                     <td class="text-center">
