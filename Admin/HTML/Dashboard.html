@@ -91,65 +91,7 @@
   </div>
 </div>
 
-<!-- User Transaction History Modal -->
-<div class="modal fade" id="userTransactionModal" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content glass-effect">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-clock-history me-2"></i>User Transaction History
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="card mb-3 glass-effect">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-2">
-                  <span class="text-muted">Mobile Number:</span>
-                  <h5 id="modalUserMobile" class="mb-0"></h5>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="mb-2">
-                  <span class="text-muted">Total Transactions:</span>
-                  <h5 id="modalUserTransactionCount" class="mb-0"></h5>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Plan</th>
-              <th>Amount (₹)</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-            </thead>
-            <tbody id="userTransactionHistoryBody">
-            <!-- User transaction history will be populated here -->
-            <tr>
-              <td colspan="5" class="text-center">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <!-- Bootstrap JS and Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

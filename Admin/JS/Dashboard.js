@@ -63,24 +63,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${plan.mobileNumber}</td>
-                    <td>${plan.planName || 'Uncategorized'}</td>
-                    <td>₹0</td>
-                    <td>${expiryDate.toLocaleDateString()}</td>
-                    <td class="${daysRemaining <= 2 ? 'text-danger' : 'text-warning'}">${daysRemaining} days</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-info view-history" 
-                                data-mobile="${plan.mobileNumber}" 
-                                data-userid="${plan.userId}">
-                            <i class="bi bi-clock-history me-1"></i>History
-                        </button>
-                    </td>
-                `;
+    <td>${index + 1}</td>
+    <td>${plan.mobileNumber}</td>
+    <td>${plan.planName || 'Uncategorized'}</td>
+    <td>₹${plan.amount ? plan.amount.toFixed(2) : '0.00'}</td>
+    <td>${expiryDate.toLocaleDateString()}</td>
+    <td class="${daysRemaining <= 2 ? 'text-danger' : 'text-warning'}">${daysRemaining} days</td>
+    <td class="text-center">
+        <button class="btn btn-sm btn-info view-history" 
+                data-mobile="${plan.mobileNumber}" 
+                data-userid="${plan.userId}">
+            <i class="bi bi-clock-history me-1"></i>History
+        </button>
+    </td>
+`;
 
                     expiringPlansBody.appendChild(row);
                 });
-
                 // Add event listeners to history buttons
                 document.querySelectorAll('.view-history').forEach(button => {
                     button.addEventListener('click', function() {
