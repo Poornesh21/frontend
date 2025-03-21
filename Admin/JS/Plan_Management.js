@@ -21,35 +21,62 @@ let categoriesData = [];
 let selectedPlan = null;
 
 // Function to properly close modal and remove backdrop
-function closeModal(modalInstance) {
-    if (!modalInstance) return;
-    modalInstance.hide();
-    setTimeout(() => {
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-            backdrop.remove();
+function safelyCloseModal(modalElement) {
+    try {
+        // Try to get modal instance
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+        // If no instance exists yet, create one
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(modalElement);
         }
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
-    }, 200);
+
+        // Hide the modal
+        modalInstance.hide();
+
+        // Clean up backdrop and body classes
+        setTimeout(() => {
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
+        }, 300);
+    } catch (e) {
+        console.error("Error closing modal:", e);
+        // Fallback approach
+        if (modalElement) {
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
+        }
+    }
 }
 
-// Fetch wrapper with console debug logs
-async function fetchData(url, options = {}) {
-    console.log(`FETCH: Attempting to fetch data from ${url}`);
+// Improved fetch wrapper with authentication
+async function fetchWithAuth(url, options = {}) {
+    // Get token from both localStorage and sessionStorage (for compatibility)
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-    // Get token from localStorage
-    const token = localStorage.getItem('token');
-
-    console.log(`FETCH: Using token: ${token ? "Yes (token exists)" : "No token found"}`);
+    if (!token) {
+        console.error('No authentication token found');
+        showAlert('Your session has expired. Please login again.', 'danger');
+        setTimeout(() => window.location.href = 'Login.html', 2000);
+        return null;
+    }
 
     const defaultOptions = {
         headers: {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        mode: 'cors'
+            'Authorization': `Bearer ${token}`
+        }
     };
 
     const mergedOptions = {
@@ -62,70 +89,32 @@ async function fetchData(url, options = {}) {
     };
 
     try {
-        console.log(`FETCH: Request options:`, mergedOptions);
-
-        // Use a regular fetch without auth for public endpoints (categories)
-        const isPublicEndpoint = url.includes('/api/categories') || url.includes('/api/plans');
-
-        let response;
-        if (isPublicEndpoint && !url.includes('/api/admin')) {
-            // For public endpoints, try without authentication first
-            response = await fetch(url, {
-                headers: { 'Content-Type': 'application/json' }
-            });
-            console.log(`FETCH: Public endpoint response status: ${response.status}`);
-        } else {
-            // For admin endpoints, use authentication
-            response = await fetch(url, mergedOptions);
-            console.log(`FETCH: Admin endpoint response status: ${response.status}`);
-        }
+        console.log(`Making ${options.method || 'GET'} request to ${url}`);
+        const response = await fetch(url, mergedOptions);
 
         if (response.status === 401) {
-            console.error('FETCH ERROR: Authentication token expired or invalid.');
-            showAlert('Authentication failed. Please login again.', 'danger');
-            return;
+            console.error('Authentication token expired');
+            showAlert('Your session has expired. Please login again.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return null;
         }
 
         if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorBody}`);
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
         }
 
-        console.log(`FETCH SUCCESS: Got response from ${url}`);
         return response;
     } catch (error) {
-        console.error('FETCH ERROR:', error);
-
-        if (error.message.includes('Failed to fetch')) {
-            console.error('FETCH ERROR: Network error - server might be down or CORS issue');
-            showAlert('Network error. Ensure backend is running and CORS is configured.', 'danger');
-        } else {
-            console.error(`FETCH ERROR: ${error.message}`);
-            showAlert(`Error: ${error.message}`, 'danger');
-        }
-
-        // For debugging, try fetching without auth header
-        if (!url.includes('/api/categories') && !url.includes('/api/plans')) {
-            console.log('FETCH DEBUG: Trying without auth header to test CORS...');
-            try {
-                const debugResponse = await fetch(url, {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                console.log(`FETCH DEBUG: Response without auth: ${debugResponse.status}`);
-            } catch (debugError) {
-                console.error('FETCH DEBUG ERROR:', debugError);
-            }
-        }
-
-        throw error;
+        console.error('Fetch error:', error);
+        showAlert(`Error: ${error.message}`, 'danger');
+        return null;
     }
 }
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
-
-
 
     document.querySelectorAll('.modal').forEach(modalEl => {
         modalEl.addEventListener('hidden.bs.modal', function () {
@@ -176,10 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const modalElement = this.closest('.modal');
             if (modalElement) {
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                if (modalInstance) {
-                    closeModal(modalInstance);
-                }
+                safelyCloseModal(modalElement);
             }
         });
     });
@@ -187,8 +173,6 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchPlans();
     fetchCategories();
 });
-
-// Create debug panel
 
 // Login as admin to get a valid token
 async function loginAsAdmin() {
@@ -220,6 +204,7 @@ async function loginAsAdmin() {
         // Store the real token from backend
         if (authData.token) {
             localStorage.setItem('token', authData.token);
+            sessionStorage.setItem('token', authData.token);
             showAlert('Admin login successful', 'success');
             addDebugInfo("Admin login successful - using real token now");
 
@@ -264,7 +249,7 @@ async function testEndpoints() {
 
         // Test admin plans endpoint
         debugContent.innerHTML += '<p>Testing admin plans endpoint...</p>';
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         const adminPlansResponse = await fetch(`${API_BASE_URL}/api/admin/plans`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -286,102 +271,93 @@ async function testEndpoints() {
 // FIXED: Fetch plans from the backend, trying public endpoint first
 async function fetchPlans() {
     try {
-        planTableBody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2 mb-0">Loading plans data...</p>
-                </td>
-            </tr>
-        `;
-
-        console.log("First trying public plans endpoint...");
-        addDebugInfo("Trying public plans endpoint first");
-
-        // Try public endpoint first
-        let backendPlans = [];
-        let usePublicEndpoint = false;
-
-        try {
-            const publicResponse = await fetch(`${API_BASE_URL}/api/plans`);
-            console.log("Public plans endpoint status:", publicResponse.status);
-
-            if (publicResponse.ok) {
-                backendPlans = await publicResponse.json();
-                console.log("Public plans available:", backendPlans.length);
-                addDebugInfo(`Public plans available: ${backendPlans.length}`);
-                usePublicEndpoint = true;
-            }
-        } catch (e) {
-            console.error("Error checking public plans:", e);
-            addDebugInfo(`Error checking public plans: ${e.message}`);
+        if (planTableBody) {
+            planTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading plans data...</span>
+                        </div>
+                        <p class="mt-2 mb-0">Loading plans data...</p>
+                    </td>
+                </tr>
+            `;
         }
 
-        // If public endpoint fails, try admin endpoint
-        if (!usePublicEndpoint) {
-            console.log("Public endpoint failed, trying admin endpoint...");
-            addDebugInfo("Trying admin endpoint");
+        console.log("Fetching plans data...");
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-            const response = await fetchData(PLANS_API_URL);
-            if (!response) {
-                throw new Error("No response from admin plans API");
-            }
-
-            backendPlans = await response.json();
-            console.log("Plans from admin API:", backendPlans.length);
-            addDebugInfo(`Received ${backendPlans.length} plans from admin API`);
+        if (!token) {
+            showAlert('Authentication token missing. Please log in again.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
         }
 
+        const response = await fetch(`${API_BASE_URL}/api/admin/plans`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 401) {
+            showAlert('Your session has expired. Please log in again.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        const backendPlans = await response.json();
         console.log("Raw plans data from API:", backendPlans);
 
         if (!Array.isArray(backendPlans)) {
             console.warn("Backend did not return an array, using empty array instead");
-            addDebugInfo("API didn't return an array! Using empty array instead.");
-            backendPlans = [];
+            plansData = [];
+        } else {
+            // Transform the plans data from backend format to frontend format
+            plansData = backendPlans.map(plan => {
+                const planId = plan.planId || plan.id;
+                console.log(`Processing plan ${planId}:`, plan);
+
+                let categoryName = plan.categoryName || plan.category;
+                if (!categoryName && plan.categoryId) {
+                    const category = categoriesData.find(c => c.id == plan.categoryId || c.categoryId == plan.categoryId);
+                    categoryName = category ? (category.name || category.categoryName) : 'Uncategorized';
+                }
+
+                return {
+                    id: planId,
+                    categoryId: plan.categoryId,
+                    category: categoryName || 'Uncategorized',
+                    planName: plan.planName || 'Unnamed Plan',
+                    price: typeof plan.price === 'number' ? plan.price : parseFloat(plan.price) || 0,
+                    data: plan.data || plan.dataLimit || '-',
+                    validity: plan.validity || (plan.validityDays ? plan.validityDays + ' days' : '-'),
+                    calls: plan.calls || 'Unlimited',
+                    benefits: plan.benefits || plan.ottBenefits || 'No additional benefits',
+                    // Support both isActive and active properties
+                    active: plan.isActive === true || plan.active === true || plan.status === 'Active'
+                };
+            });
         }
 
-        // Transform the plans data from backend format to frontend format
-        plansData = backendPlans.map(plan => {
-            const planId = plan.planId || plan.id;
-            console.log(`Processing plan ${planId}:`, plan);
-
-            let categoryName = plan.categoryName || plan.category;
-            if (!categoryName && plan.categoryId) {
-                const category = categoriesData.find(c => c.id == plan.categoryId || c.categoryId == plan.categoryId);
-                categoryName = category ? (category.name || category.categoryName) : 'Uncategorized';
-            }
-
-            return {
-                id: planId,
-                categoryId: plan.categoryId,
-                category: categoryName || 'Uncategorized',
-                planName: plan.planName || 'Unnamed Plan',
-                price: typeof plan.price === 'number' ? plan.price : parseFloat(plan.price) || 0,
-                data: plan.data || plan.dataLimit || '-',
-                validity: plan.validity || (plan.validityDays ? plan.validityDays + ' days' : '-'),
-                calls: plan.calls || 'Unlimited',
-                benefits: plan.benefits || plan.ottBenefits || 'No additional benefits',
-                // Support both isActive and active properties
-                active: plan.isActive === true || plan.active === true || plan.status === 'Active'
-            };
-        });
-
         console.log("Transformed plans data:", plansData);
-        addDebugInfo(`Transformed ${plansData.length} plans for display`);
         renderTable();
 
         if (plansData.length > 0) {
+            showAlert('Plans loaded successfully', 'success', 2000);
         } else {
             showAlert('No plans found. You can add new plans.', 'info');
         }
     } catch (error) {
         console.error("Error in fetch operation:", error);
-        addDebugInfo(`Error: ${error.message}`);
         plansData = [];
         renderTable();
-        showAlert('Failed to load plans from server. Please ensure the backend service is running.', 'warning');
+        showAlert('Failed to load plans: ' + error.message, 'warning');
     }
 }
 
@@ -404,9 +380,10 @@ async function fetchCategories() {
         });
 
         console.log("Fetching categories from:", CATEGORIES_API_URL);
-        const response = await fetchData(CATEGORIES_API_URL);
-        if (!response) {
-            throw new Error("No response from categories API");
+
+        const response = await fetch(CATEGORIES_API_URL);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const categories = await response.json();
@@ -414,7 +391,6 @@ async function fetchCategories() {
 
         if (!Array.isArray(categories)) {
             console.warn("Categories API did not return an array");
-            addDebugInfo("Categories API didn't return an array!");
             categoriesData = [];
         } else {
             categoriesData = categories
@@ -427,17 +403,15 @@ async function fetchCategories() {
 
         console.log("Mapped categories data:", categoriesData);
 
-        if (categoriesData.length > 0) {
-            populateCategoryDropdowns();
-        } else {
+        populateCategoryDropdowns();
 
-            populateCategoryDropdowns();
+        if (categoriesData.length === 0) {
+            showAlert('No categories found. Please add a category first.', 'warning');
         }
     } catch (error) {
         console.error("Error fetching categories:", error);
-        addDebugInfo(`Category error: ${error.message}`);
         categoriesData = [];
-        showAlert('Failed to load categories from server. Please add a new category to begin.', 'warning');
+        showAlert('Failed to load categories: ' + error.message, 'warning');
         populateCategoryDropdowns();
     }
 }
@@ -515,19 +489,16 @@ function updatePlanCount() {
 
 // Render plan table
 function renderTable() {
+    if (!planTableBody) {
+        console.error("Plan table body element not found");
+        return;
+    }
+
     planTableBody.innerHTML = '';
 
-    // For debugging, show the actual plan data we have
-    addDebugInfo(`Rendering table with ${plansData.length} plans`);
+    console.log("Rendering table with plans:", plansData);
 
-    const sortedPlans = [...plansData].sort((a, b) => {
-        if (a.active !== b.active) return b.active - a.active;
-        return a.price - b.price;
-    });
-
-    console.log("Rendering table with plans:", sortedPlans);
-
-    if (sortedPlans.length === 0) {
+    if (plansData.length === 0) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td colspan="8" class="text-center py-4">
@@ -550,6 +521,12 @@ function renderTable() {
         updatePlanCount();
         return;
     }
+
+    // Sort plans: active first, then by price
+    const sortedPlans = [...plansData].sort((a, b) => {
+        if (a.active !== b.active) return b.active - a.active;
+        return a.price - b.price;
+    });
 
     sortedPlans.forEach(plan => {
         const row = document.createElement('tr');
@@ -591,6 +568,7 @@ function renderTable() {
 
     updatePlanCount();
 
+    // Initialize tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -614,10 +592,33 @@ async function togglePlanStatus(planId) {
         switchElement.disabled = true;
         console.log(`Toggling plan ${planId} status. New state (from checkbox): ${newState}`);
 
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            showAlert('Authentication required. Please log in.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
         // Call the backend PATCH endpoint for toggling the status.
-        const response = await fetchData(`${PLANS_API_URL}/${planId}/toggle-status`, {
-            method: 'PATCH'
+        const response = await fetch(`${PLANS_API_URL}/${planId}/toggle-status`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
+
+        if (response.status === 401) {
+            showAlert('Your session has expired. Please log in again.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
         const updatedPlan = await response.json();
         console.log('Backend response:', updatedPlan);
 
@@ -644,7 +645,7 @@ async function togglePlanStatus(planId) {
         console.error('Error in togglePlanStatus:', error);
         // Revert the checkbox to its previous state in case of error.
         switchElement.checked = !newState;
-        showAlert('Failed to update plan status. Please try again.', 'danger');
+        showAlert('Failed to update plan status: ' + error.message, 'danger');
     } finally {
         // Re-enable the switch.
         switchElement.disabled = false;
@@ -749,6 +750,13 @@ async function savePlan() {
         showAlert("Selected category not found. Try refreshing the page.", "warning");
         return;
     }
+
+    // Show loading state
+    const saveButton = document.querySelector('#addPlanModal button.btn-success');
+    const originalButtonText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Saving...';
+    saveButton.disabled = true;
+
     const getPlanName = () => {
         const planNameElement = document.getElementById('planName');
         return planNameElement ? planNameElement.value || 'New Plan' : 'New Plan';
@@ -774,10 +782,33 @@ async function savePlan() {
     };
     console.log("Attempting to save plan:", newPlan);
     try {
-        const response = await fetchData(PLANS_API_URL, {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            showAlert('Authentication required. Please log in.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
+        const response = await fetch(PLANS_API_URL, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(newPlan)
         });
+
+        if (response.status === 401) {
+            showAlert('Your session has expired. Please log in again.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
         const createdPlan = await response.json();
         console.log("Plan created successfully:", createdPlan);
         const frontendPlan = {
@@ -793,228 +824,148 @@ async function savePlan() {
             active: createdPlan.isActive !== undefined ? createdPlan.isActive : true
         };
         plansData.push(frontendPlan);
-        closeModal(addPlanModal);
+
+        // Close modal
+        safelyCloseModal(document.getElementById('addPlanModal'));
         form.reset();
+
+        // Refresh table
         renderTable();
         showAlert(`New ${frontendPlan.category} plan has been added`, 'success');
     } catch (error) {
         console.error("Error creating plan:", error);
-        showAlert("Failed to save plan to the database. Please check the server connection and try again.", "danger");
+        showAlert("Failed to save plan: " + error.message, "danger");
+    } finally {
+        // Restore button state
+        saveButton.innerHTML = originalButtonText;
+        saveButton.disabled = false;
     }
 }
 
-// Update existing plan
-async function updatePlan() {
-    const form = document.getElementById('editPlanForm');
-    if (!form) {
-        console.error("Edit plan form not found");
-        showAlert("Form not found. Please refresh the page and try again.", "danger");
-        return;
-    }
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    if (!selectedPlan) {
-        console.error("No plan selected for update");
-        showAlert("No plan selected for update", "danger");
-        return;
-    }
-    const editCategoryElement = document.getElementById('editCategory');
-    if (!editCategoryElement || !editCategoryElement.value) {
-        showAlert("Please select a category", "warning");
-        return;
-    }
-    const categoryId = parseInt(editCategoryElement.value);
-    if (isNaN(categoryId)) {
-        showAlert("Invalid category selection", "warning");
-        return;
-    }
-    console.log("Looking for category with ID:", categoryId);
-    console.log("Available categories:", categoriesData);
-    const categoryObj = categoriesData.find(c => c.id == categoryId);
-    if (!categoryObj) {
-        console.error(`Category with ID ${categoryId} not found in local data`);
-        showAlert("Selected category not found. Try refreshing the page.", "warning");
-        return;
-    }
-    const updatedPlan = {
-        planId: selectedPlan.id,
-        categoryId: categoryId,
-        categoryName: categoryObj.name,
-        planName: selectedPlan.planName || 'Updated Plan',
-        price: parseFloat(document.getElementById('editPrice').value),
-        data: document.getElementById('editData').value,
-        validity: document.getElementById('editValidity').value,
-        calls: document.getElementById('editCalls').value,
-        benefits: document.getElementById('editBenefits').value,
-        isActive: selectedPlan.active
-    };
-    console.log("Attempting to update plan:", updatedPlan);
-    try {
-        const response = await fetchData(`${PLANS_API_URL}/${selectedPlan.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(updatedPlan)
-        });
-        const returnedPlan = await response.json();
-        console.log("Plan updated successfully:", returnedPlan);
-        const frontendPlan = {
-            id: returnedPlan.planId || returnedPlan.id || selectedPlan.id,
-            categoryId: categoryId,
-            category: categoryObj.name,
-            planName: returnedPlan.planName || selectedPlan.planName || 'Updated Plan',
-            price: returnedPlan.price,
-            data: returnedPlan.data,
-            validity: returnedPlan.validity,
-            calls: returnedPlan.calls || 'Unlimited',
-            benefits: returnedPlan.benefits || 'No additional benefits',
-            active: returnedPlan.isActive !== undefined ? returnedPlan.isActive : selectedPlan.active
-        };
-        console.log("Updated frontend plan:", frontendPlan);
-        const index = plansData.findIndex(p => p.id === selectedPlan.id);
-        if (index !== -1) {
-            plansData[index] = frontendPlan;
-        }
-        closeModal(editPlanModal);
-        renderTable();
-        showAlert(`${frontendPlan.category} plan has been updated`, 'success');
-    } catch (error) {
-        console.error("Error updating plan:", error);
-        showAlert("Failed to update plan in the database. Please check the server connection and try again.", "danger");
-    }
-}
+// login.js - Admin login authentication with improved security
 
-// Show modal to create a new category
-function showNewCategoryModal(selectElement) {
-    console.log("Opening new category modal");
-    let categoryModal = document.getElementById('newCategoryModal');
-    let newCategoryModal;
-    if (!categoryModal) {
-        console.log("Creating new category modal");
-        const modalHTML = `
-        <div class="modal fade" id="newCategoryModal" tabindex="-1" aria-labelledby="newCategoryModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content glass-effect">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="newCategoryModalLabel">Add New Category</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="newCategoryForm">
-                            <div class="mb-3">
-                                <label for="newCategoryName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="newCategoryName" required>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelNewCategory">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="saveNewCategory">Save Category</button>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        categoryModal = document.getElementById('newCategoryModal');
-        newCategoryModal = new bootstrap.Modal(categoryModal);
-        document.getElementById('saveNewCategory').addEventListener('click', function() {
-            saveNewCategory(selectElement);
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+    const usernameField = document.getElementById('username');
+    const loginButton = document.getElementById('loginButton');
+    const errorMessage = document.getElementById('errorMessage') || createErrorMessage();
+    const API_BASE_URL = 'http://localhost:8080'; // Change this to match your backend URL
+
+    function createErrorMessage() {
+        const errorDiv = document.createElement('div');
+        errorDiv.id = 'errorMessage';
+        errorDiv.className = 'alert alert-danger mt-3 d-none';
+        const formBottomArea = document.querySelector('.form-bottom') || loginForm;
+        formBottomArea.parentNode.insertBefore(errorDiv, formBottomArea.nextSibling);
+        return errorDiv;
+    }
+
+    // Animate shapes (keeping the existing animation)
+    const shapes = document.querySelectorAll('.glass-shape');
+    shapes.forEach((shape, index) => {
+        shape.style.animation = `float ${8 + index}s ease-in-out infinite`;
+    });
+
+    // Toggle password visibility
+    if (togglePassword && passwordField) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.className = type === 'password' ? 'fas fa-eye password-toggle' : 'fas fa-eye-slash password-toggle';
         });
-        document.getElementById('cancelNewCategory').addEventListener('click', function() {
-            if (selectElement) {
-                selectElement.value = "";
+    }
+
+    // Show error message function
+    function showError(message) {
+        if (!errorMessage) return;
+
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('d-none');
+
+        // Hide after 5 seconds
+        setTimeout(() => {
+            errorMessage.classList.add('d-none');
+        }, 5000);
+    }
+
+    // Form submission
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = usernameField.value.trim();
+            const password = passwordField.value;
+
+            // Simple validation
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+
+            // Set button to loading state
+            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Logging in...';
+            loginButton.disabled = true;
+
+            try {
+                // Clear any previous auth tokens
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+
+                // Prepare the login data
+                const loginData = {
+                    username: username,
+                    password: password
+                };
+
+                console.log('Attempting login with:', username);
+
+                // Send authentication request to Spring Security JWT endpoint
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Login successful', data);
+
+                    // Check if user has admin role
+                    if (data.roles && data.roles.includes('ROLE_ADMIN')) {
+                        // Store JWT token in both localStorage and sessionStorage
+                        localStorage.setItem('token', data.token);
+                        sessionStorage.setItem('token', data.token);
+
+                        console.log('Admin login successful, redirecting...');
+                        window.location.href = 'Dashboard.html';
+                    } else {
+                        // If not admin, show error
+                        showError('Access denied. Admin privileges required.');
+                        loginButton.innerHTML = 'Login';
+                        loginButton.disabled = false;
+                    }
+                } else {
+                    // Get error message from response if available
+                    try {
+                        const errorData = await response.json();
+                        showError(errorData.message || 'Invalid username or password');
+                    } catch (e) {
+                        showError('Invalid username or password');
+                    }
+
+                    loginButton.innerHTML = 'Login';
+                    loginButton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Error connecting to server. Please try again later.');
+                loginButton.innerHTML = 'Login';
+                loginButton.disabled = false;
             }
         });
-    } else {
-        newCategoryModal = new bootstrap.Modal(categoryModal);
     }
-    const form = document.getElementById('newCategoryForm');
-    if (form) form.reset();
-    newCategoryModal.show();
-    console.log("New category modal shown");
-}
-
-// Save a new category to the database
-async function saveNewCategory(selectElement) {
-    const categoryNameInput = document.getElementById('newCategoryName');
-    if (!categoryNameInput || !categoryNameInput.value.trim()) {
-        showAlert("Please enter a category name", "warning");
-        return;
-    }
-    const newCategoryName = categoryNameInput.value.trim();
-    console.log(`Attempting to save new category: ${newCategoryName}`);
-    try {
-        const newCategory = { categoryName: newCategoryName };
-        // Use the appropriate endpoint for admin operations
-        const response = await fetchData(ADMIN_CATEGORIES_API_URL, {
-            method: 'POST',
-            body: JSON.stringify(newCategory)
-        });
-        const createdCategory = await response.json();
-        console.log("New category created:", createdCategory);
-        const categoryForDropdown = {
-            id: createdCategory.categoryId,
-            name: createdCategory.categoryName
-        };
-        console.log("Category for dropdown:", categoryForDropdown);
-        categoriesData.push(categoryForDropdown);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('newCategoryModal'));
-        if (modal) {
-            closeModal(modal);
-        }
-        populateCategoryDropdowns();
-        if (selectElement) {
-            console.log("Setting selectElement value to:", categoryForDropdown.id);
-            setTimeout(() => {
-                selectElement.value = categoryForDropdown.id;
-                const event = new Event('change', { bubbles: true });
-                selectElement.dispatchEvent(event);
-            }, 200);
-        }
-        showAlert(`New category "${newCategoryName}" created successfully`, "success");
-    } catch (error) {
-        console.error("Error creating new category:", error);
-        showAlert("Failed to create category in the database. Please check the server connection and try again.", "danger");
-    }
-}
-
-// Show alert notification
-function showAlert(message, type) {
-    console.log(`[Alert - ${type}]: ${message}`);
-
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.role = 'alert';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-
-    alertsContainer.appendChild(alertDiv);
-
-    // Auto dismiss after 5 seconds
-    setTimeout(() => {
-        alertDiv.classList.remove('show');
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 300);
-    }, 5000);
-}
-
-// Logout function to clear token and redirect to login
-function logout() {
-    console.log('Logging out...');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = 'Login.html';
-}
-
-// Make functions available globally
-window.openAddPlanModal = openAddPlanModal;
-window.openEditModal = openEditModal;
-window.savePlan = savePlan;
-window.updatePlan = updatePlan;
-window.togglePlanStatus = togglePlanStatus;
-window.logout = logout;
-window.showNewCategoryModal = showNewCategoryModal;
-window.loginAsAdmin = loginAsAdmin;
+});
