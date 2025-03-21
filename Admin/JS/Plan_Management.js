@@ -114,65 +114,91 @@ async function fetchWithAuth(url, options = {}) {
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
+    try {
+        console.log('DOM fully loaded and parsed');
 
-    document.querySelectorAll('.modal').forEach(modalEl => {
-        modalEl.addEventListener('hidden.bs.modal', function () {
-            console.log('Modal hidden event triggered for', this.id);
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
+        // Initialize modal elements
+        document.querySelectorAll('.modal').forEach(modalEl => {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                console.log('Modal hidden event triggered for', this.id);
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            });
+        });
+
+        // Initialize modals safely
+        const addModalElement = document.querySelector('#addPlanModal');
+        if (addModalElement) {
+            try {
+                addPlanModal = new bootstrap.Modal(addModalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                console.log("Add plan modal initialized");
+            } catch (e) {
+                console.error("Error initializing add plan modal:", e);
             }
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        });
-    });
+        } else {
+            console.error("Add plan modal element not found in DOM");
+        }
 
-    const addModalElement = document.querySelector('#addPlanModal');
-    const editModalElement = document.querySelector('#editPlanModal');
-
-    if (addModalElement) {
-        addPlanModal = new bootstrap.Modal(addModalElement, {
-            backdrop: true,
-            keyboard: true,
-            focus: true
-        });
-        console.log("Add plan modal initialized");
-    } else {
-        console.error("Add plan modal element not found in DOM");
-    }
-
-    if (editModalElement) {
-        editPlanModal = new bootstrap.Modal(editModalElement, {
-            backdrop: true,
-            keyboard: true,
-            focus: true
-        });
-        console.log("Edit plan modal initialized");
-    } else {
-        console.error("Edit plan modal element not found in DOM");
-    }
-
-    if (sidebarToggleBtn) {
-        sidebarToggleBtn.addEventListener('click', function() {
-            sidebar.classList.toggle('sidebar-mobile');
-        });
-    }
-
-    const cancelButtons = document.querySelectorAll('[data-bs-dismiss="modal"]');
-    cancelButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const modalElement = this.closest('.modal');
-            if (modalElement) {
-                safelyCloseModal(modalElement);
+        const editModalElement = document.querySelector('#editPlanModal');
+        if (editModalElement) {
+            try {
+                editPlanModal = new bootstrap.Modal(editModalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                console.log("Edit plan modal initialized");
+            } catch (e) {
+                console.error("Error initializing edit plan modal:", e);
             }
-        });
-    });
+        } else {
+            console.error("Edit plan modal element not found in DOM");
+        }
 
-    fetchPlans();
-    fetchCategories();
+        // Initialize sidebar toggle
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-mobile');
+            });
+        }
+
+        // Initialize dismiss buttons for modals
+        const cancelButtons = document.querySelectorAll('[data-bs-dismiss="modal"]');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const modalElement = this.closest('.modal');
+                if (modalElement) {
+                    safelyCloseModal(modalElement);
+                }
+            });
+        });
+
+        // Initialize page data
+        fetchPlans();
+        fetchCategories();
+
+    } catch (error) {
+        console.error("Error during page initialization:", error);
+        showAlert("There was an error initializing the page. Please refresh and try again.", "danger");
+    }
 });
+
+// Add this function to your Plan_Management.js file
+function updatePlanCount() {
+    const planCountElement = document.getElementById('planCount');
+    if (planCountElement) {
+        planCountElement.textContent = `${plansData.length} plan${plansData.length !== 1 ? 's' : ''}`;
+    }
+}
 
 // Login as admin to get a valid token
 async function loginAsAdmin() {
@@ -268,7 +294,8 @@ async function testEndpoints() {
     }
 }
 
-// FIXED: Fetch plans from the backend, trying public endpoint first
+// Fix the fetchPlans function
+// Fetch plans from the backend
 async function fetchPlans() {
     try {
         if (planTableBody) {
@@ -288,31 +315,55 @@ async function fetchPlans() {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
         if (!token) {
-            showAlert('Authentication token missing. Please log in again.', 'danger');
+            console.error("Authentication token missing");
+            // Instead of showAlert, use a direct approach
+            displayMessage('Authentication token missing. Please log in again.', 'danger');
             setTimeout(() => window.location.href = 'Login.html', 2000);
             return;
         }
 
+        // Log the request details for debugging
+        console.log(`Making request to: ${API_BASE_URL}/api/admin/plans`);
+        console.log(`With token: ${token.substring(0, 10)}...`);
+
         const response = await fetch(`${API_BASE_URL}/api/admin/plans`, {
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         });
 
         if (response.status === 401) {
-            showAlert('Your session has expired. Please log in again.', 'danger');
+            console.error("Authentication failed with 401 error");
+            displayMessage('Your session has expired. Please log in again.', 'danger');
             setTimeout(() => window.location.href = 'Login.html', 2000);
             return;
         }
 
+        // Log response status for debugging
+        console.log(`Response status: ${response.status}`);
+
         if (!response.ok) {
             const errorText = await response.text();
+            console.error(`Server returned error: ${errorText}`);
             throw new Error(`Server error: ${response.status} - ${errorText}`);
         }
 
-        const backendPlans = await response.json();
-        console.log("Raw plans data from API:", backendPlans);
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
+
+        // Handle empty response
+        if (!responseText.trim()) {
+            console.warn("Empty response received");
+            plansData = [];
+            renderTable();
+            return;
+        }
+
+        const backendPlans = JSON.parse(responseText);
+        console.log("Parsed plans data from API:", backendPlans);
 
         if (!Array.isArray(backendPlans)) {
             console.warn("Backend did not return an array, using empty array instead");
@@ -340,7 +391,8 @@ async function fetchPlans() {
                     calls: plan.calls || 'Unlimited',
                     benefits: plan.benefits || plan.ottBenefits || 'No additional benefits',
                     // Support both isActive and active properties
-                    active: plan.isActive === true || plan.active === true || plan.status === 'Active'
+                    active: plan.isActive === true || plan.active === true ||
+                        plan.status === 'Active' || (typeof plan.status === 'string' && plan.status.toLowerCase() === 'active')
                 };
             });
         }
@@ -349,15 +401,41 @@ async function fetchPlans() {
         renderTable();
 
         if (plansData.length > 0) {
-            showAlert('Plans loaded successfully', 'success', 2000);
+            displayMessage('Plans loaded successfully', 'success', 2000);
         } else {
-            showAlert('No plans found. You can add new plans.', 'info');
+            displayMessage('No plans found. You can add new plans.', 'info');
         }
     } catch (error) {
         console.error("Error in fetch operation:", error);
         plansData = [];
         renderTable();
-        showAlert('Failed to load plans: ' + error.message, 'warning');
+        displayMessage('Failed to load plans: ' + error.message, 'warning');
+    }
+}
+
+// Create a simple function to display messages (alternative to showAlert)
+function displayMessage(message, type = 'info', duration = 5000) {
+    const alertsContainer = document.getElementById('alertsContainer');
+    if (!alertsContainer) {
+        console.error('Alerts container not found');
+        return;
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    alertsContainer.appendChild(alertDiv);
+
+    if (duration > 0) {
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 300);
+        }, duration);
     }
 }
 
@@ -481,9 +559,123 @@ function populateCategoryDropdowns() {
 }
 
 // Update plan count badge
-function updatePlanCount() {
-    if (planCount) {
-        planCount.textContent = `${plansData.length} plan${plansData.length !== 1 ? 's' : ''}`;
+// Update plan with improved error handling and logging
+async function updatePlan() {
+    const planId = document.getElementById('editPlanId').value;
+    if (!planId) {
+        console.error("No plan ID provided for update");
+        showAlert("Cannot update plan: missing plan ID", "danger");
+        return;
+    }
+
+    console.log(`Updating plan ID: ${planId}`);
+
+    // Get form values
+    const categoryId = document.getElementById('editCategory').value;
+    const price = document.getElementById('editPrice').value;
+    const data = document.getElementById('editData').value;
+    const validity = document.getElementById('editValidity').value;
+    const calls = document.getElementById('editCalls').value;
+    const benefits = document.getElementById('editBenefits').value;
+
+    // Simple validation
+    if (!categoryId || !price) {
+        showAlert("Category and price are required fields", "warning");
+        return;
+    }
+
+    // Find the category name
+    const category = categoriesData.find(c => c.id == categoryId);
+    if (!category) {
+        console.error(`Category with ID ${categoryId} not found`);
+        showAlert("Selected category not found", "warning");
+        return;
+    }
+
+    // Create plan object with proper field names matching the backend expectations
+    const updatedPlan = {
+        categoryId: parseInt(categoryId),
+        price: parseFloat(price),
+        data: data,
+        validity: validity,
+        calls: calls || "Unlimited",
+        benefits: benefits || "No additional benefits"
+    };
+
+    console.log("Sending updated plan data:", updatedPlan);
+
+    // Show loading state
+    const updateButton = document.querySelector('#editPlanModal button.btn-primary');
+    const originalButtonText = updateButton.innerHTML;
+    updateButton.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Saving...';
+    updateButton.disabled = true;
+
+    try {
+        // Get the token
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            showAlert('Authentication required. Please log in.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
+        // Log request details
+        console.log(`Making PUT request to: ${PLANS_API_URL}/${planId}`);
+
+        const response = await fetch(`${PLANS_API_URL}/${planId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(updatedPlan)
+        });
+
+        // Log response status
+        console.log(`Response status: ${response.status}`);
+
+        if (response.status === 401) {
+            showAlert('Your session has expired. Please log in again.', 'danger');
+            setTimeout(() => window.location.href = 'Login.html', 2000);
+            return;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Server error response: ${errorText}`);
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        const responseData = await response.json();
+        console.log("Plan updated successfully:", responseData);
+
+        // Update local plan data
+        const index = plansData.findIndex(p => p.id == planId);
+        if (index !== -1) {
+            plansData[index] = {
+                ...plansData[index],
+                categoryId: parseInt(categoryId),
+                category: category.name,
+                price: parseFloat(price),
+                data: data,
+                validity: validity,
+                calls: calls || "Unlimited",
+                benefits: benefits || "No additional benefits"
+            };
+        }
+
+        // Close modal and refresh table
+        safelyCloseModal(document.getElementById('editPlanModal'));
+        renderTable();
+        showAlert("Plan updated successfully", "success");
+    } catch (error) {
+        console.error("Error updating plan:", error);
+        showAlert(`Failed to update plan: ${error.message}`, "danger");
+    } finally {
+        // Restore button state
+        updateButton.innerHTML = originalButtonText;
+        updateButton.disabled = false;
     }
 }
 
@@ -518,7 +710,12 @@ function renderTable() {
                 }
             });
         }
-        updatePlanCount();
+        // Update count
+        try {
+            updatePlanCount();
+        } catch (e) {
+            console.error("Error updating plan count:", e);
+        }
         return;
     }
 
@@ -531,7 +728,7 @@ function renderTable() {
     sortedPlans.forEach(plan => {
         const row = document.createElement('tr');
         row.classList.add('plan-row');
-        row.setAttribute('data-plan-id', plan.id);
+        if (plan.id) row.setAttribute('data-plan-id', plan.id);
         const category = plan.category || 'Uncategorized';
         const price = plan.price || 0;
         const data = plan.data || '-';
@@ -566,13 +763,22 @@ function renderTable() {
         planTableBody.appendChild(row);
     });
 
-    updatePlanCount();
+    // Update count safely
+    try {
+        updatePlanCount();
+    } catch (e) {
+        console.error("Error updating plan count:", e);
+    }
 
     // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    try {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    } catch (e) {
+        console.error("Error initializing tooltips:", e);
+    }
 }
 
 // Updated toggle plan status function with explicit state update and flexible response property
@@ -857,12 +1063,70 @@ document.addEventListener('DOMContentLoaded', function() {
         const errorDiv = document.createElement('div');
         errorDiv.id = 'errorMessage';
         errorDiv.className = 'alert alert-danger mt-3 d-none';
-        const formBottomArea = document.querySelector('.form-bottom') || loginForm;
-        formBottomArea.parentNode.insertBefore(errorDiv, formBottomArea.nextSibling);
+
+        // Check if the form exists before trying to append
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            const formBottomArea = document.querySelector('.form-bottom') || loginForm;
+            formBottomArea.parentNode.insertBefore(errorDiv, formBottomArea.nextSibling);
+        } else {
+            // If we're not on the login page, add to alerts container instead
+            const alertsContainer = document.getElementById('alertsContainer');
+            if (alertsContainer) {
+                alertsContainer.appendChild(errorDiv);
+            }
+        }
         return errorDiv;
     }
 
-    // Animate shapes (keeping the existing animation)
+    /**
+     * Shows an alert message to the user
+     * @param {string} message - The message to display
+     * @param {string} type - The alert type (success, danger, warning, info)
+     * @param {number} duration - How long to show the alert in milliseconds (optional)
+     */
+    function showAlert(message, type = 'info', duration = 5000) {
+        // Get alerts container
+        const alertsContainer = document.getElementById('alertsContainer');
+        if (!alertsContainer) {
+            console.error('Alerts container not found');
+            return;
+        }
+
+        // Create alert element
+        const alertElement = document.createElement('div');
+        alertElement.className = `alert alert-${type} alert-dismissible fade show`;
+        alertElement.role = 'alert';
+
+        // Add alert content
+        alertElement.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+        // Add to container
+        alertsContainer.appendChild(alertElement);
+
+        // Create Bootstrap alert instance
+        const bsAlert = new bootstrap.Alert(alertElement);
+
+        // Auto-dismiss after duration if needed
+        if (duration > 0) {
+            setTimeout(() => {
+                try {
+                    bsAlert.close();
+                } catch (e) {
+                    // Fallback if Bootstrap alert fails
+                    alertElement.remove();
+                }
+            }, duration);
+        }
+
+        // Return the alert element in case it needs to be manipulated
+        return alertElement;
+    }
+
+        // Animate shapes (keeping the existing animation)
     const shapes = document.querySelectorAll('.glass-shape');
     shapes.forEach((shape, index) => {
         shape.style.animation = `float ${8 + index}s ease-in-out infinite`;
