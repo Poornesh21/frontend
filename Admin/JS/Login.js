@@ -1,4 +1,4 @@
-// login.js - Admin login authentication
+// login.js - Admin login authentication with improved security
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
@@ -71,9 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Check if user has admin role
                 if (data.roles && data.roles.includes('ROLE_ADMIN')) {
-                    // Store JWT token and user information in localStorage
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify({
+                    // Store JWT token and user information in sessionStorage instead of localStorage
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('user', JSON.stringify({
                         username: data.username,
                         roles: data.roles
                     }));
@@ -105,6 +105,4 @@ document.addEventListener('DOMContentLoaded', function() {
             loginButton.disabled = false;
         }
     });
-
-    // Check if admin user is already logged in on page load
 });

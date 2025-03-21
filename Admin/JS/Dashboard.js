@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Base API URL
     const BASE_URL = 'http://localhost:8080/api';
 
-    // Get JWT token from localStorage
-    const token = localStorage.getItem('token');
+    // Get JWT token from sessionStorage instead of localStorage
+    const token = sessionStorage.getItem('token');
     if (!token) {
         window.location.href = 'Login.html';
         return;
